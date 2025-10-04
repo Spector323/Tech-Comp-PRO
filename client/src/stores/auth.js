@@ -1,51 +1,35 @@
 import { defineStore } from 'pinia';
-import { register, login, updateProfile } from '@/api/auth';
+import { login, register } from '@/service/authService';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    token: localStorage.getItem('token') || '',
+    token: localStorage.getItem('token') || null,
     user: JSON.parse(localStorage.getItem('user')) || null
   }),
+  getters: {
+    isAuthenticated: (state) => !!state.token && !!state.user,
+    userRole: (state) => state.user?.role || null
+  },
   actions: {
     async login(data) {
-      try {
-        const response = await login(data);
-        this.token = response.token;
-        this.user = response.user;
-        localStorage.setItem('token', this.token);
-        localStorage.setItem('user', JSON.stringify(this.user));
-        return response;
-      } catch (error) {
-        throw error;
-      }
+      const response = await login(data);
+      this.token = response.token;
+      this.user = response.user;
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('user', JSON.stringify(response.user));
     },
     async register(data) {
-      try {
-        const response = await register(data);
-        return response;
-      } catch (error) {
-        throw error;
-      }
+      await register(data);
     },
     async updateUser(data) {
-      try {
-        const updatedUser = await updateProfile(this.token, data);
-        this.user = updatedUser;
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-        return updatedUser;
-      } catch (error) {
-        throw error;
-      }
+      this.user = { ...this.user, ...data };
+      localStorage.setItem('user', JSON.stringify(this.user));
     },
     logout() {
-      this.token = '';
+      this.token = null;
       this.user = null;
       localStorage.removeItem('token');
       localStorage.removeItem('user');
     }
-  },
-  getters: {
-    isAuthenticated: (state) => !!state.token && !!state.user,
-    userRole: (state) => state.user?.role || null
   }
 });

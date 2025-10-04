@@ -1,13 +1,20 @@
-/* src/assets/main.css */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+:root {
+  --primary-color: #333;
+  --font-size: 16px;
+}
+
+[data-theme="dark"] {
+  --primary-color: #4caf50;
+  --background-color: #1a1a1a;
+  --text-color: #ffffff;
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f5f7fa;
-  color: #333;
+  background: var(--background-color, #ffffff);
+  color: var(--text-color, #2d2d2d);
+  font-size: var(--font-size);
 }
 
+.animated {
+  transition: all 0.3s ease;
+}

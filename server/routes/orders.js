@@ -1,84 +1,111 @@
 const express = require('express');
-const { restrictTo } = require('../middleware/root');
 const Order = require('../models/Order');
+const { restrictTo } = require('../middleware/root');
 
 const router = express.Router();
 
-// Создание заявки (для менеджеров)
-router.post('/', restrictTo('manager'), async (req, res) => {
-  const { userId, service } = req.body;
-
-  if (!userId || !service) {
-    return res.status(400).json({ message: 'ID пользователя и описание услуги обязательны' });
+// Создание заявки (для клиентов и менеджеров)
+router.post('/', restrictTo('client', 'manager'), async (req, res) => {
+  const { service, category, userId } = req.body;
+  if (!service) {
+    return res.status(400).json({ message: 'Описание услуги обязательно' });
   }
-
   try {
-    const order = new Order({ userId, service });
+    const order = new Order({
+      userId: userId || req.userId, // Менеджер может указать userId клиента
+      service,
+      category: category || 'other',
+      status: 'pending',
+      progress: 1,
+      updates: [],
+      assignedMaster: null
+    });
     await order.save();
-    res.status(201).json({ message: 'Заявка создана', order });
+    res.status(201).json(order);
   } catch (error) {
-    console.error('Ошибка создания заявки:', error);
-    res.status(500).json({ message: 'Ошибка сервера' });
+    res.status(500).json({ message: 'Ошибка создания заявки' });
   }
 });
 
-// Получение заявок клиента
-router.get('/user/:userId', restrictTo('client', 'admin', 'manager'), async (req, res) => {
+// Получение заявок пользователя
+router.get('/user/:userId', restrictTo('client', 'admin', 'manager', 'master'), async (req, res) => {
   try {
-    const orders = await Order.find({ userId: req.params.userId }).populate('userId', 'firstName lastName email');
+    const orders = await Order.find({ userId: req.params.userId }).populate('userId', 'firstName lastName');
     res.json(orders);
   } catch (error) {
-    console.error('Ошибка получения заявок:', error);
-    res.status(500).json({ message: 'Ошибка сервера' });
+    res.status(500).json({ message: 'Ошибка получения заявок' });
   }
 });
 
-// Добавление обновления к заявке (для мастеров)
-router.post('/:orderId/update', restrictTo('master'), async (req, res) => {
+// Получение всех заявок (для админа/менеджера)
+router.get('/', restrictTo('admin', 'manager', 'master'), async (req, res) => {
+  try {
+    const orders = await Order.find().populate('userId', 'firstName lastName');
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: 'Ошибка получения заявок' });
+  }
+});
+
+// Получение заявок, назначенных мастеру
+router.get('/master/:masterId', restrictTo('master'), async (req, res) => {
+  try {
+    const orders = await Order.find({ assignedMaster: req.params.masterId }).populate('userId', 'firstName lastName');
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: 'Ошибка получения заявок мастера' });
+  }
+});
+
+// Добавление обновления к заявке
+router.post('/:orderId/update', restrictTo('master', 'manager'), async (req, res) => {
   const { description } = req.body;
   if (!description) {
     return res.status(400).json({ message: 'Описание обновления обязательно' });
   }
-
   try {
     const order = await Order.findById(req.params.orderId);
-    if (!order) {
-      return res.status(404).json({ message: 'Заявка не найдена' });
-    }
-
-    order.updates.push({
-      description,
-      createdBy: req.userId
-    });
-
-    // Пример: обновляем прогресс в зависимости от описания
-    if (description.includes('диагностика')) {
-      order.progress = 2;
-    } else if (description.includes('ремонт')) {
-      order.progress = 3;
-    } else if (description.includes('тест')) {
-      order.progress = 4;
-    } else if (description.includes('выдача')) {
-      order.progress = 5;
-      order.status = 'completed';
-    }
-
+    if (!order) return res.status(404).json({ message: 'Заявка не найдена' });
+    order.updates.push({ description, createdAt: new Date() });
     await order.save();
-    res.json({ message: 'Обновление добавлено', order });
+    res.json(order);
   } catch (error) {
-    console.error('Ошибка добавления обновления:', error);
-    res.status(500).json({ message: 'Ошибка сервера' });
+    res.status(500).json({ message: 'Ошибка добавления обновления' });
   }
 });
 
-// Получение всех заявок (для админов)
-router.get('/', restrictTo('admin'), async (req, res) => {
+// Обновление статуса и прогресса заявки
+router.patch('/:orderId', restrictTo('master', 'manager'), async (req, res) => {
+  const { status, progress } = req.body;
+  if (!status && !progress) {
+    return res.status(400).json({ message: 'Укажите статус или прогресс' });
+  }
   try {
-    const orders = await Order.find().populate('userId', 'firstName lastName email');
-    res.json(orders);
+    const order = await Order.findById(req.params.orderId);
+    if (!order) return res.status(404).json({ message: 'Заявка не найдена' });
+    if (status) order.status = status;
+    if (progress) order.progress = progress;
+    await order.save();
+    res.json(order);
   } catch (error) {
-    console.error('Ошибка получения всех заявок:', error);
-    res.status(500).json({ message: 'Ошибка сервера' });
+    res.status(500).json({ message: 'Ошибка обновления заявки' });
+  }
+});
+
+// Назначение мастера на заявку
+router.patch('/assign/:orderId', restrictTo('admin', 'manager'), async (req, res) => {
+  const { masterId } = req.body;
+  if (!masterId) {
+    return res.status(400).json({ message: 'Укажите ID мастера' });
+  }
+  try {
+    const order = await Order.findById(req.params.orderId);
+    if (!order) return res.status(404).json({ message: 'Заявка не найдена' });
+    order.assignedMaster = masterId;
+    await order.save();
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ message: 'Ошибка назначения мастера' });
   }
 });
 
