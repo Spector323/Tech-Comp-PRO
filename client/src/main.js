@@ -1,17 +1,17 @@
-import { createApp } from 'vue';
-import App from './App.vue';
-import router from './router'; // Импорт роутера
-import { createPinia } from 'pinia';
-import Toast from 'vue-toastification';
-import 'vue-toastification/dist/index.css';
-import Vue3AnimateOnScroll from 'vue3-animate-onscroll';
-import './assets/main.css'; // Глобальные стили
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import App from './App.vue'
+import router from './router'
 
-const app = createApp(App);
+const app = createApp(App)
+const pinia = createPinia()
 
-app.use(router);
-app.use(createPinia());
-app.use(Toast);
-app.use(Vue3AnimateOnScroll);
+app.use(pinia)
+app.use(router)
 
-app.mount('#app');
+// Инициализируем authStore после создания приложения
+import { useAuthStore } from '@/stores/authStore'
+const authStore = useAuthStore()
+authStore.initializeAuth()
+
+app.mount('#app')

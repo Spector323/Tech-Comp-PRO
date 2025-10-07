@@ -1,45 +1,54 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const path = require('path');
 require('dotenv').config();
+const path = require('path');
 
-// Импорт роутов
+// Импортируем роуты
 const authRoutes = require('./routes/auth');
-const profileRoutes = require('./routes/profile');
-const orderRoutes = require('./routes/orders');
 const userRoutes = require('./routes/users');
-const categoryRoutes = require('./routes/categories');
-
+const orderRoutes = require('./routes/orders');
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-// Статическая папка для аватаров
+
+// ✅ ОБЯЗАТЕЛЬНО: Добавьте статические файлы ДО роутов
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Подключение к MongoDB
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ Успешно подключились к MongoDB'))
-  .catch((error) => console.error('❌ Ошибка подключения:', error));
-
-// Роуты
+// Подключаем роуты
 app.use('/api/auth', authRoutes);
-app.use('/api/profile', profileRoutes);
-app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/categories', categoryRoutes);
+app.use('/api/orders', orderRoutes);
 
-// Главная страница
-app.get('/', (req, res) => {
-  res.send('Сервер аутентификации работает!');
+// Тестовый роут - проверяем что сервер работает
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Сервер работает!' });
 });
+
+// Подключение к базе данных
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('✅ Подключились к MongoDB');
+  } catch (error) {
+    console.log('❌ Ошибка подключения к MongoDB:', error);
+    process.exit(1);
+  }
+};
 
 // Запуск сервера
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Сервер запущен на http://localhost:${PORT}`);
-});
+const startServer = async () => {
+  await connectDB();
+  
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`🚀 Сервер запущен на порту ${PORT}`);
+    console.log(`📚 API доступно по адресу: http://localhost:${PORT}/api`);
+    console.log(`🖼️  Статические файлы: http://localhost:${PORT}/uploads`);
+  });
+};
+
+startServer();

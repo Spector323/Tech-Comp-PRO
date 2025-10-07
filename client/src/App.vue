@@ -1,6 +1,6 @@
 <template>
-  <div class="app">
-    <Header />
+  <div id="app">
+    <Header v-if="$route.name !== 'Auth'" />
     <router-view />
   </div>
 </template>
@@ -14,4 +14,18 @@ export default {
 };
 </script>
 
-<style src="./assets/main.css"></style>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#app {
+  min-height: 100vh;
+  background: var(--background-color);
+  color: var(--text-color);
+  font-family: Arial, sans-serif;
+  font-size: var(--font-size);
+}
+</style>

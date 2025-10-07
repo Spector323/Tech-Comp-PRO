@@ -1,145 +1,224 @@
 <template>
-  <div class="header-container" v-if="showHeader">
-    <header>
-      <div class="logo">Logo</div>
-      <div class="cn-link">
-        <div class="link-bl"><router-link to="/home">Главная</router-link></div>
-        <div class="link-bl"><router-link to="/profile">О нас</router-link></div>
-        <div class="link-bl"><router-link to="/service">Сервис</router-link></div>
+  <header class="header">
+    <div class="container">
+      <div class="logo">
+        <router-link to="/" class="logo-link">
+          <span class="logo-text">TECH KOMP</span>
+          <span class="logo-pro">PRO</span>
+        </router-link>
       </div>
-      <div v-if="isAuthenticated" class="profile-cn" @click="goToProfile">
-        <img :src="user?.avatar || 'default-avatar.png'" alt="Аватар" class="avatar" />
-        <div class="profile">
-          <h2 v-if="user?.firstName">{{ user.firstName }} {{ user.lastName }}</h2>
-          <p v-if="user?.email">{{ user.email }}</p>
-        </div>
-      </div>
-      <button v-if="isAuthenticated" @click="onLogout" class="btn-logout">Выйти</button>
-    </header>
-  </div>
+
+      <nav class="nav">
+        <router-link to="/" class="nav-link">Главная</router-link>
+        <router-link to="/services" class="nav-link">Сервисы</router-link>
+        <router-link to="/about" class="nav-link">О нас</router-link>
+        
+        <template v-if="isAuthenticated">
+          <router-link to="/orders" class="nav-link">Мои заявки</router-link>
+          <router-link to="/profile" class="nav-link">Профиль</router-link>
+          
+          <router-link v-if="isManager || isAdmin" to="/admin" class="nav-link admin-link">
+            Админка
+          </router-link>
+          
+          <router-link v-if="isMaster" to="/workshop" class="nav-link">
+            Мастерская
+          </router-link>
+          
+          <div class="user-menu">
+            <span class="user-role">{{ userRoleLabel }}</span>
+            <button @click="logout" class="logout-btn">
+              Выйти
+            </button>
+          </div>
+        </template>
+
+        <template v-else>
+          <router-link to="/auth" class="nav-link login-link">Войти</router-link>
+        </template>
+      </nav>
+    </div>
+  </header>
 </template>
 
 <script>
-import { useAuthStore } from '@/stores/auth';
-import { useRouter, useRoute } from 'vue-router';
+import { useAuthStore } from '@/stores/authStore'
+import { computed } from 'vue'
 
 export default {
-  name: 'Header',
+  name: 'AppHeader',
+  
   setup() {
-    const authStore = useAuthStore();
-    const router = useRouter();
-    const route = useRoute();
-    return { authStore, router, route };
-  },
-  computed: {
-    user() {
-      return this.authStore.user;
-    },
-    isAuthenticated() {
-      return this.authStore.isAuthenticated;
-    },
-    showHeader() {
-      return this.route.path !== '/auth';
-    }
-  },
-  methods: {
-    onLogout() {
-      this.authStore.logout();
-      this.router.push('/auth');
-    },
-    goToProfile() {
-      if (this.authStore.userRole === 'client') {
-        this.router.push('/profile');
-      } else if (this.authStore.userRole === 'admin') {
-        this.router.push('/admin');
-      } else if (this.authStore.userRole === 'manager') {
-        this.router.push('/manager');
-      } else if (this.authStore.userRole === 'master') {
-        this.router.push('/master');
+    const authStore = useAuthStore()
+
+    const isAuthenticated = computed(() => authStore.isAuthenticated)
+    const userRole = computed(() => authStore.userRole)
+    const isAdmin = computed(() => authStore.isAdmin)
+    const isManager = computed(() => authStore.isManager)
+    const isMaster = computed(() => authStore.isMaster)
+
+    const userRoleLabel = computed(() => {
+      const roles = {
+        'client': 'Клиент',
+        'master': 'Мастер', 
+        'manager': 'Менеджер',
+        'admin': 'Администратор'
+      }
+      return roles[userRole.value] || 'Пользователь'
+    })
+
+    const logout = () => {
+      if (confirm('Вы уверены, что хотите выйти?')) {
+        authStore.logout()
+        window.location.href = '/'
       }
     }
+
+    return {
+      isAuthenticated,
+      userRoleLabel,
+      isAdmin,
+      isManager,
+      isMaster,
+      logout
+    }
   }
-};
+}
 </script>
 
 <style scoped>
-.header-container {
-  background: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 16px 32px;
+.header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #f0f0f0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: all 0.3s ease;
 }
 
-header {
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1440px;
-  margin: 0 auto;
+  padding: 1rem 2rem;
 }
 
-.logo {
-  font-size: 24px;
-  font-weight: 600;
-  color: #333;
-}
-
-.cn-link {
-  display: flex;
-  gap: 16px;
-}
-
-.link-bl a {
-  color: #333;
+.logo-link {
   text-decoration: none;
-  font-size: 16px;
-}
-
-.link-bl a:hover {
-  text-decoration: underline;
-}
-
-.profile-cn {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  cursor: pointer;
-}
-
-.profile-cn:hover .profile h2,
-.profile-cn:hover .profile p {
-  color: #555;
-}
-
-.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 12px;
-  object-fit: cover;
-}
-
-.profile h2 {
-  font-size: 18px;
   font-weight: 600;
-  margin-bottom: 4px;
-  color: #2d2d2d;
+  font-size: 1.3rem;
+  color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
-.profile p {
-  font-size: 14px;
-  color: #757575;
+.logo-pro {
+  background: #1a1a1a;
+  color: white;
+  padding: 0.1rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
 }
 
-.btn-logout {
-  background: transparent;
-  border: none;
-  color: #c62828;
-  font-size: 16px;
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.nav-link {
+  color: #666;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.nav-link:hover {
+  color: #1a1a1a;
+  background: #f8f9fa;
+}
+
+.nav-link.router-link-active {
+  color: #1a1a1a;
+  background: #f8f9fa;
+}
+
+.login-link {
+  background: #1a1a1a;
+  color: white;
+}
+
+.login-link:hover {
+  background: #333;
+  color: white;
+}
+
+.admin-link {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.admin-link:hover {
+  background: #ffeaa7;
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.user-role {
+  font-size: 0.8rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.logout-btn {
+  background: none;
+  border: 1px solid #dc3545;
+  color: #dc3545;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
   cursor: pointer;
-  margin-left: 16px;
+  transition: all 0.3s ease;
 }
 
-.btn-logout:hover {
-  color: #e53935;
+.logout-btn:hover {
+  background: #dc3545;
+  color: white;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .nav {
+    gap: 1rem;
+  }
+  
+  .nav-link {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .user-menu {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
 }
 </style>

@@ -1,51 +1,68 @@
+// Модель пользователя - описывает структуру данных пользователя в базе
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
-    required: true,
+    required: [true, 'Имя обязательно'],
     trim: true
   },
   lastName: {
     type: String,
-    required: true,
+    required: [true, 'Фамилия обязательна'],
+    trim: true
+  },
+  email: {
+    type: String,
+    required: [true, 'Email обязателен'],
+    unique: true,
+    lowercase: true,
     trim: true
   },
   phone: {
     type: String,
     trim: true
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    lowercase: true
-  },
   password: {
     type: String,
-    required: true,
-    minlength: 6
+    required: [true, 'Пароль обязателен'],
+    minlength: 6,
+    select: false
   },
   avatar: {
     type: String,
-    default: '/avatar.png'
+    default: '/assets/avatar.png'
   },
   role: {
     type: String,
-    enum: ['client', 'admin', 'manager', 'master'], // Ограничение на роли
-    default: 'client' // Роль по умолчанию
+    enum: ['client', 'master', 'manager', 'admin'],
+    default: 'client'
+  },
+  specialization: {
+    type: String, // Для мастеров: "Ноутбуки", "Телефоны", "Компьютеры"
+    default: ''
+  },
+  isActive: {
+    type: Boolean,
+    default: true
   }
 }, {
-  timestamps: true // Автоматически добавляет createdAt и updatedAt
+  timestamps: true
 });
-
-// Хеширование пароля перед сохранением
-userSchema.pre('save', async function (next) {
+console.log('✅ Модель User загружена!');
+// Шифруем пароль перед сохранением
+userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
-  this.password = await bcrypt.hash(this.password, 12);
+  
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
   next();
 });
+
+// Метод для проверки пароля
+userSchema.methods.checkPassword = async function(password) {
+  return await bcrypt.compare(password, this.password);
+};
 
 module.exports = mongoose.model('User', userSchema);
