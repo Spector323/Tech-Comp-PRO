@@ -3,7 +3,7 @@
     <!-- Левая колонка: профиль -->
     <div class="profile-card">
       <div class="avatar-section">
-        <img :src="`http://localhost:3000${user.avatar}` || '/avatar.png'" :alt="`${user.firstName} ${user.lastName}`" class="avatar"
+        <img :src="`http://localhost:3000/${user.avatar}` || '/src/assets/avatar.png'" :alt="`${user.firstName} ${user.lastName}`" class="avatar"
           @error="handleImageError" /> <button @click="triggerAvatarUpload" class="btn-avatar-edit">✏️</button>
 
         <input type="file" ref="avatarInput" @change="handleAvatarUpload" accept="image/*" style="display: none" />
@@ -248,7 +248,7 @@ export default {
         user.value = {
           ...profileData.user,
           // ✅ Аватар загружается с сервера, если null - используем дефолтный
-          avatar: profileData.user.avatar || '/avatar.png'
+          avatar: profileData.user.avatar || '/src/assets/avatar.png'
         }
         editForm.value = { ...profileData.user }
 

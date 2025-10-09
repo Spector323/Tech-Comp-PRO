@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
-    default: '/assets/avatar.png'
+    default: '/src/assets/avatar.png'
   },
   role: {
     type: String,
@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema({
     default: 'client'
   },
   specialization: {
-    type: String, // Для мастеров: "Ноутбуки", "Компьютеры"
+    type: String, // Для мастеров: "Ноутбуки", "Телефоны", "Компьютеры"
     default: ''
   },
   isActive: {

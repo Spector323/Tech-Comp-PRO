@@ -8,6 +8,10 @@ import Profile from '@/pages/Profile.vue'
 import Orders from '@/pages/Orders.vue'
 import Services from '@/pages/Services.vue'
 import About from '@/pages/About.vue'
+import ManagerPanel from '@/pages/ManagerPanel.vue'
+import MasterPanel from '@/pages/MasterPanel.vue'
+import AdminPanel from '@/pages/AdminPanel.vue'
+// import AdminPanel from '@/pages/AdminPanel.vue'
 
 const routes = [
   {
@@ -37,10 +41,28 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/manager',
+    name: 'ManagerPanel',
+    component: ManagerPanel,
+    meta: { requiresAuth: true, requiresManager: true }
+  },
+  {
+    path: '/master',
+    name: 'MasterPanel',
+    component: MasterPanel,
+    meta: { requiresAuth: true, requiresMaster: true } // Было requiresManager: true
+  },
+  {
     path: '/orders',
     name: 'Orders',
     component: Orders,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/admin',
+    name: 'AdminPanel',
+    component: AdminPanel,
+    meta: { requiresAuth: true, requiresAdmin: true }
   }
 ]
 
@@ -55,6 +77,12 @@ router.beforeEach((to, from, next) => {
   
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next('/auth')
+  } else if (to.meta.requiresManager && !authStore.isManager && !authStore.isAdmin) {
+    next('/')
+  } else if (to.meta.requiresMaster && !authStore.isMaster && !authStore.isAdmin) {
+    next('/')
+  } else if (to.meta.requiresAdmin && !authStore.isAdmin) {
+    next('/')
   } else {
     next()
   }

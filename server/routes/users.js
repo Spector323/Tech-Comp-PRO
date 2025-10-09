@@ -12,7 +12,7 @@ const auth = require('../middleware/auth');
 // ✅ Настройка multer для загрузки файлов
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadDir = 'uploads/avatars/';
+    const uploadDir = 'avatars/';
     // Создаем папку если не существует
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
@@ -88,7 +88,7 @@ router.post('/avatar', auth, upload.single('avatar'), async (req, res) => {
 router.get('/profile', auth, async (req, res) => {
   try {
     console.log('Запрос профиля для пользователя:', req.user.email);
-    
+
     res.json({
       success: true,
       user: {
@@ -162,7 +162,7 @@ router.put('/profile', auth, async (req, res) => {
 
   } catch (error) {
     console.error('Ошибка обновления профиля:', error);
-    
+
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map(err => err.message);
       return res.status(400).json({
@@ -170,11 +170,282 @@ router.put('/profile', auth, async (req, res) => {
         message: messages.join(', ')
       });
     }
-    
+
     res.status(500).json({
       success: false,
       message: 'Ошибка обновления профиля',
       error: error.message
+    });
+  }
+});
+
+// ✅ Получить всех пользователей (только для админа)
+router.get('/admin/users', auth, async (req, res) => {
+  try {
+    // Проверяем права доступа
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Доступ запрещен'
+      });
+    }
+
+    const users = await User.find()
+      .select('-password') // Исключаем пароль
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      users
+    });
+
+  } catch (error) {
+    console.error('Ошибка загрузки пользователей:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Ошибка загрузки пользователей'
+    });
+  }
+});
+
+// ✅ Создать пользователя (админ)
+router.post('/admin/users', auth, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Доступ запрещен'
+      });
+    }
+
+    const { firstName, lastName, email, password, phone, role, specialization } = req.body;
+
+    // Проверяем обязательные поля
+    if (!firstName || !lastName || !email || !password || !role) {
+      return res.status(400).json({
+        success: false,
+        message: 'Все обязательные поля должны быть заполнены'
+      });
+    }
+
+    // Проверяем email на уникальность
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'Пользователь с таким email уже существует'
+      });
+    }
+
+    // Создаем пользователя
+    const user = new User({
+      firstName,
+      lastName,
+      email,
+      password, // Автоматически хешируется в модели
+      phone: phone || '',
+      role,
+      specialization: role === 'master' ? specialization : ''
+    });
+
+    const savedUser = await user.save();
+
+    // Убираем пароль из ответа
+    const userResponse = {
+      _id: savedUser._id,
+      firstName: savedUser.firstName,
+      lastName: savedUser.lastName,
+      email: savedUser.email,
+      phone: savedUser.phone,
+      role: savedUser.role,
+      specialization: savedUser.specialization,
+      isActive: savedUser.isActive,
+      avatar: savedUser.avatar,
+      createdAt: savedUser.createdAt
+    };
+
+    res.status(201).json({
+      success: true,
+      message: 'Пользователь успешно создан',
+      user: userResponse
+    });
+
+  } catch (error) {
+    console.error('Ошибка создания пользователя:', error);
+
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
+        success: false,
+        message: messages.join(', ')
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Ошибка создания пользователя'
+    });
+  }
+});
+
+// ✅ Обновить роль пользователя (админ)
+router.patch('/admin/users/:id/role', auth, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Доступ запрещен'
+      });
+    }
+
+    const { role, specialization } = req.body;
+    const userId = req.params.id;
+
+    // Нельзя изменить свою роль
+    if (userId === req.user.id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Нельзя изменить свою роль'
+      });
+    }
+
+    const updateData = { role };
+    if (role === 'master') {
+      updateData.specialization = specialization || '';
+    } else {
+      updateData.specialization = '';
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      updateData,
+      { new: true }
+    ).select('-password');
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'Пользователь не найден'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Роль пользователя обновлена',
+      user: updatedUser
+    });
+
+  } catch (error) {
+    console.error('Ошибка обновления роли:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Ошибка обновления роли'
+    });
+  }
+});
+
+// ✅ Переключить статус пользователя (админ)
+router.patch('/admin/users/:id/status', auth, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Доступ запрещен'
+      });
+    }
+
+    const userId = req.params.id;
+
+    // Нельзя изменить свой статус
+    if (userId === req.user.id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Нельзя изменить свой статус'
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Пользователь не найден'
+      });
+    }
+
+    user.isActive = !user.isActive;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: `Пользователь ${user.isActive ? 'активирован' : 'деактивирован'}`,
+      user: {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive
+      }
+    });
+
+  } catch (error) {
+    console.error('Ошибка изменения статуса:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Ошибка изменения статуса'
+    });
+  }
+});
+
+// ✅ Удалить пользователя (админ)
+router.delete('/admin/users/:id', auth, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Доступ запрещен'
+      });
+    }
+
+    const userId = req.params.id;
+
+    // Нельзя удалить себя
+    if (userId === req.user.id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Нельзя удалить свой аккаунт'
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Пользователь не найден'
+      });
+    }
+
+    // Проверяем есть ли связанные заявки
+    const userOrders = await Order.find({ user: userId });
+    if (userOrders.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Нельзя удалить пользователя с активными заявками'
+      });
+    }
+
+    await User.findByIdAndDelete(userId);
+
+    res.json({
+      success: true,
+      message: 'Пользователь успешно удален'
+    });
+
+  } catch (error) {
+    console.error('Ошибка удаления пользователя:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Ошибка удаления пользователя'
     });
   }
 });
