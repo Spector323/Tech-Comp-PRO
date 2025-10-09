@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema({
     default: 'client'
   },
   specialization: {
-    type: String, // Для мастеров: "Ноутбуки", "Телефоны", "Компьютеры"
+    type: String, // Для мастеров: "Ноутбуки", "Компьютеры"
     default: ''
   },
   isActive: {
@@ -50,7 +50,6 @@ const userSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
-console.log('✅ Модель User загружена!');
 // Шифруем пароль перед сохранением
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();

@@ -5,18 +5,32 @@ const mongoose = require('mongoose');
 // server/models/Order.js
 const orderSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  service: { type: String, required: true },        // Услуга: "Ремонт MacBook"
-  description: String,                              // Описание: "Не включается"
-  deviceType: String,                               // Тип: "Ноутбук"
-  deviceModel: String,                              // Модель: "MacBook Pro 16"
-  status: {
-    type: String,
-    default: 'pending',                             // pending, in_progress, completed, cancelled
+  service: { type: String, required: true },
+  description: String,
+  deviceType: String,
+  deviceModel: String,
+  price: { type: Number, default: 0 },
+  
+  // ✅ Статус и прогресс
+  status: { 
+    type: String, 
+    enum: ['pending', 'manager_review', 'accepted', 'in_progress', 'completed', 'cancelled', 'rejected'],
+    default: 'pending'
   },
-  progress: { type: Number, default: 1 },          // 1-5 (этапы ремонта)
-  price: { type: Number, default: 0 }              // Стоимость
+  progress: { type: Number, default: 1, min: 1, max: 5 },
+  
+  // ✅ Кто работает с заявкой
+  assignedManager: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  assignedMaster: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  
+  // ✅ Логи изменений
+  statusHistory: [{
+    status: String,
+    changedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    timestamp: { type: Date, default: Date.now }
+  }]
 }, {
-  timestamps: true                                  // createdAt, updatedAt
+  timestamps: true
 });
 
 module.exports = mongoose.model('Order', orderSchema);

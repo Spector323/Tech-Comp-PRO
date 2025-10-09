@@ -32,11 +32,9 @@
             </div>
           </div>
 
-          <button @click="openCreateModal" class="btn btn-primary new-order-btn">
+          <button @click="showCreateModal = true" class="btn btn-primary new-order-btn">
             <span>+ Новая заявка</span>
           </button>
-          <button @click="editOrder(order)" class="btn btn-primary edit-order-btn">✏️ Редактировать</button>
-          <button @click="deleteOrder(order)" class="btn btn-primary delete-order-btn">🗑️ Удалить</button>
         </div>
 
         <!-- Фильтры -->
@@ -64,21 +62,21 @@
           <div class="empty-icon">📋</div>
           <h3>Заявок пока нет</h3>
           <p>Создайте первую заявку на ремонт</p>
-          <button @click="createNewOrder" class="btn btn-primary">
+          <button @click="showCreateModal = true" class="btn btn-primary">
             Создать заявку
           </button>
         </div>
 
         <!-- Список заявок -->
         <div v-else class="orders-list">
-          <div v-for="order in filteredOrders" :key="order.id" class="order-card" :class="`status-${order.status}`">
+          <div v-for="order in filteredOrders" :key="order._id" class="order-card" :class="`status-${order.status}`">
             <div class="order-header">
               <div class="order-info">
                 <h3 class="order-title">{{ order.service }}</h3>
                 <p class="order-description">{{ order.description }}</p>
                 <div class="order-meta">
                   <span class="order-date">{{ formatDate(order.createdAt) }}</span>
-                  <span class="order-id">#{{ order.id }}</span>
+                  <span class="order-id">#{{ order._id.slice(-6) }}</span>
                 </div>
               </div>
 
@@ -93,7 +91,7 @@
             </div>
 
             <!-- Прогресс ремонта -->
-            <div class="repair-progress" v-if="order.status === 'in_progress'">
+            <div class="repair-progress" v-if="order.status === 'in_progress' || order.status === 'accepted'">
               <div class="progress-label">Прогресс ремонта:</div>
               <div class="progress-bar">
                 <div class="progress-fill" :style="{ width: `${(order.progress / 5) * 100}%` }"></div>
@@ -117,10 +115,8 @@
                   <span class="detail-value">{{ order.deviceType }} {{ order.deviceModel }}</span>
                 </div>
                 <div class="detail-item">
-                  <span class="detail-label">Ориентировочная готовность:</span>
-                  <span class="detail-value">
-                    {{ order.estimatedCompletion ? formatDate(order.estimatedCompletion) : 'уточняется' }}
-                  </span>
+                  <span class="detail-label">Статус:</span>
+                  <span class="detail-value">{{ statusLabels[order.status] }}</span>
                 </div>
               </div>
             </div>
@@ -135,6 +131,12 @@
               </button>
               <button v-if="order.status === 'pending'" @click="cancelOrder(order)" class="btn btn-cancel">
                 Отменить
+              </button>
+              <button v-if="order.status === 'pending'" @click="editOrder(order)" class="btn btn-outline">
+                ✏️ Редактировать
+              </button>
+              <button v-if="order.status === 'pending'" @click="deleteOrder(order)" class="btn btn-cancel">
+                🗑️ Удалить
               </button>
             </div>
           </div>
@@ -157,23 +159,21 @@
       </div>
     </section>
 
-    <!-- Модальное окно создания заявки -->
-    <div v-if="showCreateModal" class="modal-overlay" @click="closeCreateModal">
+    <!-- Модальное окно создания/редактирования заявки -->
+    <div v-if="showCreateModal || showEditModal" class="modal-overlay" @click="closeModal">
       <div class="modal-content" @click.stop>
         <div class="modal-header">
-          <h3>Новая заявка на ремонт</h3>
-          <button @click="closeCreateModal" class="close-btn">×</button>
+          <h3>{{ editingOrder ? 'Редактировать заявку' : 'Новая заявка на ремонт' }}</h3>
+          <button @click="closeModal" class="close-btn">×</button>
         </div>
 
-        <form @submit.prevent="submitNewOrder" class="modal-form">
+        <form @submit.prevent="submitOrder" class="modal-form">
           <div class="form-group">
             <label>Тип устройства *</label>
-            <select v-model="newOrder.deviceType" required class="form-input">
+            <select v-model="form.deviceType" required class="form-input">
               <option value="">Выберите тип устройства</option>
               <option value="Ноутбук">Ноутбук</option>
-              <option value="Смартфон">Смартфон</option>
               <option value="Компьютер">Компьютер</option>
-              <option value="Планшет">Планшет</option>
               <option value="Игровая консоль">Игровая консоль</option>
               <option value="Другое">Другое</option>
             </select>
@@ -181,8 +181,8 @@
 
           <div class="form-group">
             <label>Модель устройства *</label>
-            <input v-model="newOrder.deviceModel" type="text" required
-              placeholder="Например: MacBook Pro 16, iPhone 15 Pro" class="form-input">
+            <input v-model="form.deviceModel" type="text" required placeholder="Например: MacBook Pro 16, iPhone 15 Pro"
+              class="form-input">
           </div>
 
           <div class="form-group">
@@ -207,11 +207,11 @@
           </div>
 
           <div class="form-actions">
-            <button type="button" @click="closeCreateModal" class="btn btn-outline">
+            <button type="button" @click="closeModal" class="btn btn-outline">
               Отмена
             </button>
             <button type="submit" :disabled="creatingOrder" class="btn btn-primary">
-              {{ creatingOrder ? 'Создание...' : 'Создать заявку' }}
+              {{ creatingOrder ? 'Сохранение...' : (editingOrder ? 'Сохранить' : 'Создать заявку') }}
             </button>
           </div>
         </form>
@@ -223,6 +223,7 @@
 <script>
 import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
+import { orderService } from '@/services/orderService'
 
 export default {
   name: 'OrdersPage',
@@ -234,14 +235,24 @@ export default {
     const loading = ref(true)
     const creatingOrder = ref(false)
     const showCreateModal = ref(false)
+    const showEditModal = ref(false)
+    const editingOrder = ref(null)
     const currentFilter = ref('all')
     const searchQuery = ref('')
     const currentPage = ref(1)
     const itemsPerPage = ref(5)
 
+    const form = ref({
+      deviceType: '',
+      deviceModel: '',
+      service: '',
+      description: ''
+    })
+
     const filters = [
       { key: 'all', label: 'Все заявки' },
       { key: 'pending', label: 'Ожидание' },
+      { key: 'accepted', label: 'Принята' },
       { key: 'in_progress', label: 'В работе' },
       { key: 'completed', label: 'Завершённые' },
       { key: 'cancelled', label: 'Отменённые' }
@@ -249,9 +260,12 @@ export default {
 
     const statusLabels = {
       pending: 'Ожидает',
+      manager_review: 'На рассмотрении',
+      accepted: 'Принята',
       in_progress: 'В работе',
       completed: 'Готово',
-      cancelled: 'Отменено'
+      cancelled: 'Отменено',
+      rejected: 'Отклонена'
     }
 
     const progressSteps = [
@@ -262,89 +276,97 @@ export default {
       { number: 5, label: 'Выдача' }
     ]
 
-    const newOrder = ref({
-      deviceType: '',
-      deviceModel: '',
-      service: '',
-      description: ''
-    })
-
-    // Загрузка заявок
+    // Загрузка заявок с сервера
     const loadOrders = async () => {
       try {
         loading.value = true
-        console.log('Загружаем заявки...')
-
-        // Имитация загрузки с API
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
-        // Моковые данные заявок
-        orders.value = [
-          {
-            id: 1,
-            service: 'Замена дисплея',
-            description: 'Треснул экран после падения',
-            deviceType: 'Смартфон',
-            deviceModel: 'iPhone 15 Pro',
-            status: 'completed',
-            progress: 5,
-            price: 12000,
-            createdAt: '2024-01-15T10:00:00',
-            estimatedCompletion: '2024-01-17T18:00:00'
-          },
-          {
-            id: 2,
-            service: 'Чистка от пыли',
-            description: 'Сильно греется и шумит',
-            deviceType: 'Ноутбук',
-            deviceModel: 'MacBook Pro 16',
-            status: 'in_progress',
-            progress: 3,
-            price: 3000,
-            createdAt: '2024-01-18T14:30:00',
-            estimatedCompletion: '2024-01-20T17:00:00'
-          },
-          {
-            id: 3,
-            service: 'Диагностика',
-            description: 'Не включается после попадания жидкости',
-            deviceType: 'Ноутбук',
-            deviceModel: 'ASUS ROG Strix',
-            status: 'pending',
-            progress: 1,
-            price: 0,
-            createdAt: '2024-01-19T09:15:00'
-          },
-          {
-            id: 4,
-            service: 'Ремонт материнской платы',
-            description: 'Не работает USB-C порт',
-            deviceType: 'Ноутбук',
-            deviceModel: 'Dell XPS 13',
-            status: 'completed',
-            progress: 5,
-            price: 8000,
-            createdAt: '2024-01-10T11:20:00',
-            estimatedCompletion: '2024-01-12T16:30:00'
-          },
-          {
-            id: 5,
-            service: 'Замена аккумулятора',
-            description: 'Быстро разряжается',
-            deviceType: 'Смартфон',
-            deviceModel: 'Samsung Galaxy S23',
-            status: 'cancelled',
-            progress: 1,
-            price: 5000,
-            createdAt: '2024-01-17T16:45:00'
-          }
-        ]
-
+        console.log('Загружаем заявки с сервера...')
+        const response = await orderService.getMyOrders()
+        orders.value = response
         console.log('Заявки загружены:', orders.value.length)
       } catch (error) {
         console.error('Ошибка загрузки заявок:', error)
+        alert('Ошибка загрузки заявок: ' + error.message)
       } finally {
         loading.value = false
+      }
+    }
+
+    // Создание заявки
+    const submitOrder = async () => {
+      try {
+        creatingOrder.value = true
+
+        if (editingOrder.value) {
+          // Редактирование заявки
+          await orderService.updateOrder(editingOrder.value._id, form.value)
+          alert('Заявка успешно обновлена!')
+        } else {
+          // Создание новой заявки
+          await orderService.createOrder(form.value)
+          alert('Заявка успешно создана!')
+        }
+
+        await loadOrders() // Перезагружаем список
+        closeModal()
+      } catch (error) {
+        console.error('Ошибка сохранения заявки:', error)
+        alert('Ошибка: ' + error.message)
+      } finally {
+        creatingOrder.value = false
+      }
+    }
+
+    // Удаление заявки
+    const deleteOrder = async (order) => {
+      if (confirm('Вы уверены, что хотите удалить эту заявку?')) {
+        try {
+          await orderService.deleteOrder(order._id)
+          await loadOrders()
+          alert('Заявка удалена')
+        } catch (error) {
+          console.error('Ошибка удаления заявки:', error)
+          alert('Ошибка удаления: ' + error.message)
+        }
+      }
+    }
+
+    // Редактирование заявки
+    const editOrder = (order) => {
+      editingOrder.value = order
+      form.value = {
+        deviceType: order.deviceType,
+        deviceModel: order.deviceModel,
+        service: order.service,
+        description: order.description
+      }
+      showEditModal.value = true
+    }
+
+    // Отмена заявки
+    const cancelOrder = async (order) => {
+      if (confirm('Вы уверены, что хотите отменить эту заявку?')) {
+        try {
+          await orderService.updateOrder(order._id, { status: 'cancelled' })
+          await loadOrders()
+          alert('Заявка отменена')
+        } catch (error) {
+          console.error('Ошибка отмены заявки:', error)
+          alert('Ошибка отмены: ' + error.message)
+        }
+      }
+    }
+
+    // Закрытие модального окна
+    const closeModal = () => {
+      showCreateModal.value = false
+      showEditModal.value = false
+      editingOrder.value = null
+      form.value = {
+        deviceType: '',
+        deviceModel: '',
+        service: '',
+        description: ''
       }
     }
 
@@ -362,8 +384,8 @@ export default {
         const query = searchQuery.value.toLowerCase()
         filtered = filtered.filter(order =>
           order.service.toLowerCase().includes(query) ||
-          order.description.toLowerCase().includes(query) ||
-          order.deviceModel.toLowerCase().includes(query)
+          (order.description && order.description.toLowerCase().includes(query)) ||
+          (order.deviceModel && order.deviceModel.toLowerCase().includes(query))
         )
       }
 
@@ -383,7 +405,7 @@ export default {
     const stats = computed(() => {
       const total = orders.value.length
       const active = orders.value.filter(order =>
-        order.status === 'pending' || order.status === 'in_progress'
+        order.status === 'pending' || order.status === 'accepted' || order.status === 'in_progress'
       ).length
       const completed = orders.value.filter(order =>
         order.status === 'completed'
@@ -398,62 +420,12 @@ export default {
       currentPage.value = 1
     }
 
-    const createNewOrder = () => {
-      showCreateModal.value = true
-    }
-
-    const closeCreateModal = () => {
-      showCreateModal.value = false
-      // Сброс формы
-      newOrder.value = {
-        deviceType: '',
-        deviceModel: '',
-        service: '',
-        description: ''
-      }
-    }
-
-    const submitNewOrder = async () => {
-      try {
-        creatingOrder.value = true
-
-        // Имитация создания заявки через API
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
-        const order = {
-          id: Date.now(),
-          ...newOrder.value,
-          status: 'pending',
-          progress: 1,
-          price: 0,
-          createdAt: new Date().toISOString()
-        }
-
-        orders.value.unshift(order)
-        closeCreateModal()
-
-        alert('Заявка успешно создана!')
-      } catch (error) {
-        console.error('Ошибка создания заявки:', error)
-        alert('Ошибка при создании заявки')
-      } finally {
-        creatingOrder.value = false
-      }
-    }
-
     const viewOrderDetails = (order) => {
-      alert(`Детали заявки #${order.id}\n\nУслуга: ${order.service}\nУстройство: ${order.deviceType} ${order.deviceModel}\nСтатус: ${statusLabels[order.status]}`)
+      alert(`Детали заявки #${order._id.slice(-6)}\n\nУслуга: ${order.service}\nУстройство: ${order.deviceType} ${order.deviceModel}\nСтатус: ${statusLabels[order.status]}\nОписание: ${order.description}`)
     }
 
     const downloadReport = (order) => {
-      alert(`Отчёт по заявке #${order.id} скачивается...`)
-    }
-
-    const cancelOrder = (order) => {
-      if (confirm('Вы уверены, что хотите отменить эту заявку?')) {
-        order.status = 'cancelled'
-        alert('Заявка отменена')
-      }
+      alert(`Отчёт по заявке #${order._id.slice(-6)} скачивается...`)
     }
 
     const formatDate = (dateString) => {
@@ -479,6 +451,10 @@ export default {
     // Загрузка данных при монтировании
     onMounted(() => {
       console.log('Orders mounted, auth:', authStore.isAuthenticated)
+      if (!authStore.isAuthenticated) {
+        alert('Вы не авторизованы')
+        return
+      }
       loadOrders()
     })
 
@@ -487,6 +463,8 @@ export default {
       loading,
       creatingOrder,
       showCreateModal,
+      showEditModal,
+      editingOrder,
       currentFilter,
       searchQuery,
       currentPage,
@@ -494,16 +472,17 @@ export default {
       filters,
       statusLabels,
       progressSteps,
-      newOrder,
+      form,
       stats,
       filteredOrders: paginatedOrders,
       setFilter,
-      createNewOrder,
-      closeCreateModal,
-      submitNewOrder,
+      submitOrder,
+      deleteOrder,
+      editOrder,
+      cancelOrder,
+      closeModal,
       viewOrderDetails,
       downloadReport,
-      cancelOrder,
       formatDate,
       prevPage,
       nextPage
@@ -513,6 +492,29 @@ export default {
 </script>
 
 <style scoped>
+/* Стили остаются без изменений, только добавим кнопки редактирования/удаления */
+.order-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-cancel {
+  background: transparent;
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-cancel:hover {
+  background: #dc3545;
+  color: white;
+}
+
+.edit-order-btn,
+.delete-order-btn {
+  margin-left: 0.5rem;
+}
+
 .orders-page {
   background: #f8f9fa;
   min-height: 100vh;
