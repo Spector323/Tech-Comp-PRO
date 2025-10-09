@@ -8,9 +8,12 @@
           <div class="shape shape-2"></div>
           <div class="shape shape-3"></div>
           <div class="shape shape-4"></div>
+          <div class="shape shape-5"></div>
+          <div class="shape shape-6"></div>
+          <div class="shape shape-7"></div>
         </div>
       </div>
-      
+
       <div class="hero-content">
         <div class="hero-text">
           <div class="pre-title">TECH SERVICE PRO</div>
@@ -19,22 +22,22 @@
             <span class="title-highlight">премиум-класса</span>
           </h1>
           <p class="hero-subtitle">
-            Профессиональный сервис с 15-летней историей. 
+            Профессиональный сервис с 15-летней историей.
             Используем только оригинальные комплектующие и современное оборудование
           </p>
-          
+
           <div class="hero-actions">
             <button @click="scrollToServices" class="btn btn-primary">
               <span>Наши услуги</span>
               <div class="btn-arrow">→</div>
             </button>
-            
+
             <button v-if="!isAuthenticated" @click="$router.push('/auth')" class="btn btn-secondary">
               <span>Личный кабинет</span>
             </button>
           </div>
         </div>
-        
+
         <div class="hero-visual">
           <div class="device-showcase">
             <div class="device device-1" :class="{ 'animate': isVisible }">
@@ -49,7 +52,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="scroll-hint">
         <div class="scroll-line"></div>
         <span>Листайте вниз</span>
@@ -63,7 +66,7 @@
           <h2 class="section-title">Почему выбирают нас</h2>
           <p class="section-subtitle">15 лет безупречной работы и тысячи довольных клиентов</p>
         </div>
-        
+
         <div class="benefits-grid">
           <div v-for="benefit in benefits" :key="benefit.id" class="benefit-card">
             <div class="benefit-icon">
@@ -86,7 +89,7 @@
           <h2 class="section-title">Наши услуги</h2>
           <p class="section-subtitle">Полный спектр услуг по ремонту и обслуживанию техники</p>
         </div>
-        
+
         <div class="services-grid">
           <div v-for="service in services" :key="service.id" class="service-card">
             <div class="service-header">
@@ -116,7 +119,7 @@
           <h2 class="section-title">Как мы работаем</h2>
           <p class="section-subtitle">Прозрачный процесс от приема до выдачи устройства</p>
         </div>
-        
+
         <div class="process-timeline">
           <div v-for="step in processSteps" :key="step.id" class="process-step">
             <div class="step-number">{{ step.number }}</div>
@@ -135,7 +138,7 @@
         <div class="section-header">
           <h2 class="section-title">Работаем с ведущими брендами</h2>
         </div>
-        
+
         <div class="brands-grid">
           <div v-for="brand in brands" :key="brand.id" class="brand-logo">
             <div class="logo-placeholder">{{ brand.name }}</div>
@@ -153,16 +156,16 @@
             <p class="cta-description">
               Оставьте заявку и наш менеджер свяжется с вами в течение 15 минут
             </p>
-            
+
             <div class="cta-actions">
               <button v-if="!isAuthenticated" @click="$router.push('/auth')" class="btn btn-dark">
                 <span>Создать заявку</span>
               </button>
-              
+
               <button v-else @click="$router.push('/orders')" class="btn btn-dark">
                 <span>Мои заявки</span>
               </button>
-              
+
               <button class="btn btn-outline">
                 <span>+7 (999) 999-99-99</span>
               </button>
@@ -180,16 +183,16 @@ import { useAuthStore } from '@/stores/authStore'
 
 export default {
   name: 'HomePage',
-  
+
   setup() {
     const authStore = useAuthStore()
     const isVisible = ref(false)
-    
+
     const isAuthenticated = computed(() => authStore.isAuthenticated)
 
     const scrollToServices = () => {
-      document.getElementById('services').scrollIntoView({ 
-        behavior: 'smooth' 
+      document.getElementById('services').scrollIntoView({
+        behavior: 'smooth'
       })
     }
 
@@ -398,10 +401,39 @@ export default {
   border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
 }
 
+.shape-5 {
+  width: 93px;
+  height: 100px;
+  top: 36%;
+  left: 90%;
+  animation-delay: 15s;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+}
+
+.shape-6 {
+  width: 130px;
+  height: 120px;
+  top: 56%;
+  left: 1%;
+  animation-delay: 10s;
+  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+}
+
+
 @keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  33% { transform: translateY(-20px) rotate(120deg); }
-  66% { transform: translateY(10px) rotate(240deg); }
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  33% {
+    transform: translateY(-20px) rotate(120deg);
+  }
+
+  66% {
+    transform: translateY(10px) rotate(240deg);
+  }
 }
 
 .hero-content {
@@ -456,7 +488,9 @@ export default {
 }
 
 @keyframes underline {
-  to { transform: scaleX(1); }
+  to {
+    transform: scaleX(1);
+  }
 }
 
 .hero-subtitle {
@@ -592,13 +626,18 @@ export default {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
   animation: shimmer 2s infinite;
 }
 
 @keyframes shimmer {
-  0% { left: -100%; }
-  100% { left: 100%; }
+  0% {
+    left: -100%;
+  }
+
+  100% {
+    left: 100%;
+  }
 }
 
 .scroll-hint {
@@ -622,8 +661,17 @@ export default {
 }
 
 @keyframes scrollLine {
-  0%, 100% { transform: scaleY(1); opacity: 1; }
-  50% { transform: scaleY(0.5); opacity: 0.5; }
+
+  0%,
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scaleY(0.5);
+    opacity: 0.5;
+  }
 }
 
 /* Общие стили секций */
@@ -803,7 +851,8 @@ export default {
   border-top: 1px solid #f0f0f0;
 }
 
-.service-time, .service-warranty {
+.service-time,
+.service-warranty {
   font-size: 0.9rem;
   color: #666;
   font-weight: 500;
@@ -945,38 +994,38 @@ export default {
     text-align: center;
     gap: 3rem;
   }
-  
+
   .hero-title {
     font-size: 2.5rem;
   }
-  
+
   .hero-actions {
     justify-content: center;
     flex-wrap: wrap;
   }
-  
+
   .device-showcase {
     width: 300px;
     height: 200px;
   }
-  
+
   .process-step {
     flex-direction: column;
     text-align: center;
     gap: 1rem;
   }
-  
+
   .process-step:not(:last-child)::after {
     left: 50%;
     top: 4rem;
     bottom: -1rem;
     transform: translateX(-50%);
   }
-  
+
   .cta-card {
     padding: 3rem 2rem;
   }
-  
+
   .cta-actions {
     flex-direction: column;
   }

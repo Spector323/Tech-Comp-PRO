@@ -9,29 +9,29 @@
       </div>
 
       <nav class="nav">
-        <router-link to="/" class="nav-link"> 🏠 Главная </router-link>
-        <router-link to="/services" class="nav-link"> 🔧 Сервисы </router-link>
-        <router-link to="/about" class="nav-link"> ℹ️ О нас </router-link>
+        <router-link to="/" class="nav-link"> Главная </router-link>
+        <router-link to="/services" class="nav-link">  Сервисы </router-link>
+        <router-link to="/about" class="nav-link"> О нас </router-link>
 
         <template v-if="isAuthenticated">
           <!-- Профиль всегда виден -->
-          <router-link to="/profile" class="nav-link"> 👤 Профиль </router-link>
+          <router-link to="/profile" class="nav-link"> Профиль </router-link>
 
           <!-- Только для клиента: "Мои заявки" -->
-          <router-link v-if="isClient" to="/orders" class="nav-link">
-            📋 Мои заявки
+          <router-link v-if="isClient || isAdmin || isManager" to="/orders" class="nav-link">
+             Мои заявки
           </router-link>
 
           <!-- Панели управления: только свои -->
           <div class="admin-panels" v-if="isManager || isMaster || isAdmin">
-            <router-link v-if="isManager" to="/manager" class="nav-link manager-link">
-              👔 Менеджер
+            <router-link v-if="isManager || isAdmin" to="/manager" class="nav-link manager-link">
+              Менеджер
             </router-link>
-            <router-link v-if="isMaster" to="/master" class="nav-link master-link">
-              🔧 Мастер
+            <router-link v-if="isMaster || isAdmin" to="/master" class="nav-link master-link">
+             Мастер
             </router-link>
             <router-link v-if="isAdmin" to="/admin" class="nav-link admin-link">
-              ⚙️ Админ
+             Админ
             </router-link>
           </div>
 
@@ -51,7 +51,7 @@
         </template>
 
         <template v-else>
-          <router-link to="/auth" class="nav-link login-link"> 🔐 Войти </router-link>
+          <router-link to="/auth" class="nav-link login-link">  Войти </router-link>
         </template>
       </nav>
 
@@ -77,13 +77,13 @@
 
         <nav class="mobile-nav">
           <router-link to="/" class="mobile-nav-link" @click="showMobileMenu = false">
-            🏠 Главная
+            Главная
           </router-link>
           <router-link to="/services" class="mobile-nav-link" @click="showMobileMenu = false">
-            🔧 Сервисы
+            Сервисы
           </router-link>
           <router-link to="/about" class="mobile-nav-link" @click="showMobileMenu = false">
-            ℹ️ О нас
+            О нас
           </router-link>
 
           <template v-if="isAuthenticated">
