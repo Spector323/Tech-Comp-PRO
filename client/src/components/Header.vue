@@ -10,48 +10,43 @@
 
       <nav class="nav">
         <router-link to="/" class="nav-link"> Главная </router-link>
-        <router-link to="/services" class="nav-link">  Сервисы </router-link>
+        <router-link to="/services" class="nav-link"> Сервисы </router-link>
         <router-link to="/about" class="nav-link"> О нас </router-link>
 
         <template v-if="isAuthenticated">
           <!-- Профиль всегда виден -->
-          <router-link to="/profile" class="nav-link"> Профиль </router-link>
+
 
           <!-- Только для клиента: "Мои заявки" -->
           <router-link v-if="isClient || isAdmin || isManager" to="/orders" class="nav-link">
-             Мои заявки
+            Мои заявки
           </router-link>
 
           <!-- Панели управления: только свои -->
           <div class="admin-panels" v-if="isManager || isMaster || isAdmin">
-            <router-link v-if="isManager || isAdmin" to="/manager" class="nav-link manager-link">
+            <router-link v-if="isManager || isAdmin" to="/manager" class="nav-link">
               Менеджер
             </router-link>
-            <router-link v-if="isMaster || isAdmin" to="/master" class="nav-link master-link">
-             Мастер
+            <router-link v-if="isMaster || isAdmin" to="/master" class="nav-link">
+              Мастер
             </router-link>
-            <router-link v-if="isAdmin" to="/admin" class="nav-link admin-link">
-             Админ
+            <router-link v-if="isAdmin" to="/admin" class="nav-link">
+              Админ
             </router-link>
           </div>
 
           <!-- Информация пользователя -->
-          <div class="user-menu">
-            <div class="user-info">
-              <div class="user-avatar">
-                <img :src="userAvatar" :alt="userName" @error="handleAvatarError" />
-              </div>
+            <router-link to="/profile" class="user-link">
+              <img :src="userAvatar" :alt="userName" @error="handleAvatarError" class="user-avatar" />
               <div class="user-details">
                 <span class="user-name">{{ userName }}</span>
                 <span class="user-role">{{ userRoleLabel }}</span>
               </div>
-            </div>
-            <button @click="logout" class="logout-btn" title="Выйти"> 🚪 </button>
-          </div>
+            </router-link>
         </template>
 
         <template v-else>
-          <router-link to="/auth" class="nav-link login-link">  Войти </router-link>
+          <router-link to="/auth" class="nav-link login-link"> Войти </router-link>
         </template>
       </nav>
 
@@ -91,52 +86,31 @@
               👤 Профиль
             </router-link>
 
-            <router-link
-              v-if="isClient"
-              to="/orders"
-              class="mobile-nav-link"
-              @click="showMobileMenu = false"
-            >
-              📋 Мои заявки
+            <router-link v-if="isClient" to="/orders" class="mobile-nav-link" @click="showMobileMenu = false">
+              Мои заявки
             </router-link>
 
             <div class="mobile-admin-panels" v-if="isManager || isMaster || isAdmin">
-              <router-link
-                v-if="isManager"
-                to="/manager"
-                class="mobile-nav-link manager-link"
-                @click="showMobileMenu = false"
-              >
-                👔 Панель менеджера
+              <router-link v-if="isManager" to="/manager" class="mobile-nav-link manager-link"
+                @click="showMobileMenu = false">
+                Панель менеджера
               </router-link>
-              <router-link
-                v-if="isMaster"
-                to="/master"
-                class="mobile-nav-link master-link"
-                @click="showMobileMenu = false"
-              >
-                🔧 Панель мастера
+              <router-link v-if="isMaster" to="/master" class="mobile-nav-link master-link"
+                @click="showMobileMenu = false">
+                Панель мастера
               </router-link>
-              <router-link
-                v-if="isAdmin"
-                to="/admin"
-                class="mobile-nav-link admin-link"
-                @click="showMobileMenu = false"
-              >
-                ⚙️ Админ-панель
+              <router-link v-if="isAdmin" to="/admin" class="mobile-nav-link admin-link"
+                @click="showMobileMenu = false">
+                Админ-панель
               </router-link>
             </div>
 
-            <button @click="logoutMobile" class="mobile-logout-btn"> 🚪 Выйти </button>
+            <button @click="logoutMobile" class="mobile-logout-btn"> Выйти </button>
           </template>
 
           <template v-else>
-            <router-link
-              to="/auth"
-              class="mobile-nav-link login-link"
-              @click="showMobileMenu = false"
-            >
-              🔐 Войти в систему
+            <router-link to="/auth" class="mobile-nav-link login-link" @click="showMobileMenu = false">
+              Войти в систему
             </router-link>
           </template>
         </nav>
@@ -178,12 +152,12 @@ export default {
 
     const userRoleLabel = computed(() => {
       const roles = {
-        client: '👤 Клиент',
-        master: '🔧 Мастер',
-        manager: '👔 Менеджер',
-        admin: '⚙️ Администратор'
+        client: 'Клиент',
+        master: 'Мастер',
+        manager: 'Менеджер',
+        admin: 'Администратор'
       }
-      return roles[userRole.value] || '👤 Пользователь'
+      return roles[userRole.value] || 'Пользователь'
     })
 
     const toggleMobileMenu = () => {
@@ -301,6 +275,27 @@ export default {
   font-weight: 600;
 }
 
+.user-link {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  color: #555;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.user-link:hover {
+  color: #1a1a1a;
+  background: #e5e5e6;
+}
+
+
 .login-link {
   background: linear-gradient(135deg, #1a1a1a, #333);
   color: white;
@@ -322,14 +317,12 @@ export default {
 
 .manager-link {
   background: #e3f2fd;
-  color: #1565c0;
   font-size: 0.85rem;
   padding: 0.5rem 0.8rem;
 }
 
 .manager-link:hover {
-  background: #bbdefb;
-  color: #0d47a1;
+  background: #888;
 }
 
 .master-link {
@@ -357,13 +350,11 @@ export default {
 }
 
 .user-menu {
+  width: 100%;
   display: flex;
+  justify-content: flex-end;
   align-items: center;
   gap: 1rem;
-  padding: 0.5rem;
-  background: #f8f9fa;
-  border-radius: 12px;
-  margin-left: 0.5rem;
 }
 
 .user-info {
@@ -540,10 +531,12 @@ export default {
   .nav {
     gap: 0.5rem;
   }
+
   .nav-link {
     padding: 0.5rem 0.8rem;
     font-size: 0.85rem;
   }
+
   .user-name {
     display: none;
   }
@@ -553,15 +546,19 @@ export default {
   .container {
     padding: 1rem;
   }
+
   .nav {
     display: none;
   }
+
   .mobile-menu-btn {
     display: block;
   }
+
   .mobile-menu-overlay {
     display: block;
   }
+
   .logo-link {
     font-size: 1.2rem;
   }
@@ -571,12 +568,15 @@ export default {
   .container {
     padding: 0.75rem;
   }
+
   .mobile-menu {
     width: 100%;
   }
+
   .logo-text {
     font-size: 1.1rem;
   }
+
   .logo-pro {
     font-size: 0.7rem;
     padding: 0.15rem 0.4rem;

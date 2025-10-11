@@ -12,13 +12,12 @@ const auth = require('../middleware/auth');
 // ✅ Настройка multer для загрузки файлов
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadDir = 'avatars/';
-    // Создаем папку если не существует
+    const uploadDir = 'uploads/';
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
     cb(null, uploadDir);
-  },
+  }
   filename: function (req, file, cb) {
     // Создаем уникальное имя файла: userId + timestamp + extension
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -51,7 +50,7 @@ router.post('/avatar', auth, upload.single('avatar'), async (req, res) => {
     }
 
     // ✅ Создаем URL для аватара
-    const avatarUrl = `uploads/avatars/${req.file.filename}`;
+    const avatarUrl = `uploads/${req.file.filename}`;
 
     // ✅ Обновляем пользователя в базе
     const updatedUser = await User.findByIdAndUpdate(

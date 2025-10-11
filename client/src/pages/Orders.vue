@@ -133,10 +133,10 @@
                 Отменить
               </button>
               <button v-if="order.status === 'pending'" @click="editOrder(order)" class="btn btn-outline">
-                ✏️ Редактировать
+                Редактировать
               </button>
               <button v-if="order.status === 'pending'" @click="deleteOrder(order)" class="btn btn-cancel">
-                🗑️ Удалить
+                Удалить
               </button>
             </div>
           </div>

@@ -3,8 +3,9 @@
     <!-- Левая колонка: профиль -->
     <div class="profile-card">
       <div class="avatar-section">
-        <img :src="`http://localhost:3000/${user.avatar}` || '/src/assets/avatar.png'" :alt="`${user.firstName} ${user.lastName}`" class="avatar"
-          @error="handleImageError" /> <button @click="triggerAvatarUpload" class="btn-avatar-edit">✏️</button>
+        <img :src="user.avatar ? `http://localhost:3000/${user.avatar}` : '/avatar.png'"
+          :alt="`${user.firstName} ${user.lastName}`" class="avatar" @error="handleImageError" />
+        <button @click="triggerAvatarUpload" class="btn-avatar-edit">✏️</button>
 
         <input type="file" ref="avatarInput" @change="handleAvatarUpload" accept="image/*" style="display: none" />
       </div>
@@ -248,7 +249,7 @@ export default {
         user.value = {
           ...profileData.user,
           // ✅ Аватар загружается с сервера, если null - используем дефолтный
-          avatar: profileData.user.avatar || '/src/assets/avatar.png'
+          avatar: profileData.user.avatar
         }
         editForm.value = { ...profileData.user }
 
@@ -263,41 +264,22 @@ export default {
     const loadUserOrders = async () => {
       try {
         loading.value.orders = true
-
-        // Имитация загрузки заявок
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
-        // Моковые данные
-        orders.value = [
-          {
-            id: 1,
-            service: 'Ремонт MacBook Pro 16"',
-            description: 'Замена матрицы дисплея',
-            status: 'completed',
-            progress: 5,
-            price: 15000,
-            createdAt: '2024-01-15T10:00:00'
-          },
-          {
-            id: 2,
-            service: 'Замена дисплея iPhone 15 Pro',
-            description: 'Замена оригинального дисплея',
-            status: 'in_progress',
-            progress: 2,
-            price: 12000,
-            createdAt: '2024-01-18T14:30:00'
+        const response = await fetch('http://localhost:3000/api/orders', {
+          headers: {
+            'Authorization': `Bearer ${authStore.token}`
           }
-        ]
-
-        currentOrder.value = orders.value.find(order => order.status === 'in_progress') || orders.value[0]
-
+        })
+        const result = await response.json()
+        if (result.success) {
+          orders.value = result.orders
+          currentOrder.value = orders.value.find(order => order.status === 'in_progress') || orders.value[0]
+        }
       } catch (err) {
         console.error('Ошибка загрузки заявок:', err)
       } finally {
         loading.value.orders = false
       }
     }
-
     const loadUserSettings = async () => {
       try {
         const savedSettings = localStorage.getItem('userSettings')
@@ -447,11 +429,6 @@ export default {
     // Инициализация
     const initData = async () => {
       try {
-        // ✅ Сначала загружаем аватар из localStorage
-        const savedAvatar = localStorage.getItem('userAvatar')
-        if (savedAvatar) {
-          user.value.avatar = savedAvatar
-        }
 
         await Promise.all([
           loadUserData(),

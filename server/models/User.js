@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
-    default: '/src/assets/avatar.png'
+    default: '/avatar.png' // Путь к изображению по умолчанию
   },
   role: {
     type: String,
