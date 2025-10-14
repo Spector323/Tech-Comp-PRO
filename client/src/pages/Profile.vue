@@ -3,8 +3,8 @@
     <!-- Левая колонка: профиль -->
     <div class="profile-card">
       <div class="avatar-section">
-        <img :src="user.avatar ? `http://localhost:3000/${user.avatar}` : '/avatar.png'"
-          :alt="`${user.firstName} ${user.lastName}`" class="avatar" @error="handleImageError" />
+        <img :src="user.avatar || '/avatar.png'" :alt="`${user.firstName} ${user.lastName}`" class="avatar"
+          @error="handleImageError" />
         <button @click="triggerAvatarUpload" class="btn-avatar-edit">✏️</button>
 
         <input type="file" ref="avatarInput" @change="handleAvatarUpload" accept="image/*" style="display: none" />
@@ -165,6 +165,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
+import { useToast } from 'vue-toastification'
 
 export default {
   name: 'ProfilePage',
@@ -172,6 +173,7 @@ export default {
   setup() {
     const authStore = useAuthStore()
     const router = useRouter()
+    const toast = useToast()
 
     const user = ref({
       firstName: '',
@@ -276,6 +278,7 @@ export default {
         }
       } catch (err) {
         console.error('Ошибка загрузки заявок:', err)
+        toast.error('Не удалось загрузить заявки')
       } finally {
         loading.value.orders = false
       }
@@ -317,14 +320,14 @@ export default {
         // Обновляем данные пользователя
         await loadUserData()
 
-        message.value = 'Профиль успешно обновлен'
+        toast.success('Профиль успешно обновлён')
         setTimeout(() => {
           showEditModal.value = false
-        }, 1500)
+        }, 1000)
 
       } catch (err) {
         console.error('Ошибка сохранения профиля:', err)
-        error.value = err.message || 'Ошибка при сохранении профиля'
+        toast.error('Ошибка при сохранении профиля')
       } finally {
         loading.value.profile = false
       }
@@ -373,14 +376,14 @@ export default {
           authStore.user.avatar = result.user.avatar
           localStorage.setItem('user', JSON.stringify(authStore.user))
 
-          alert('Фотография успешно обновлена!')
+          toast.success('Фотография успешно обновлена!')
         } else {
-          alert('Ошибка при обновлении аватара: ' + result.message)
+          toast.error('Ошибка при обновлении аватара: ' + result.message)
         }
 
       } catch (err) {
         console.error('Ошибка загрузки аватара:', err)
-        alert('Ошибка при загрузке фото')
+        toast.error('Ошибка при загрузке фото')
       } finally {
         loading.value.profile = false
         // Очищаем input
@@ -411,7 +414,7 @@ export default {
         theme: theme.value
       }
       localStorage.setItem('userSettings', JSON.stringify(settings))
-      alert('Настройки сохранены')
+      toast.success('Настройки сохранены')
     }
 
     const formatDate = (dateStr) => {
@@ -1129,7 +1132,6 @@ input:checked+.slider:before {
   background: #555;
 }
 
-/* Адаптивность */
 @media (max-width: 968px) {
   .profile-container {
     flex-direction: column;

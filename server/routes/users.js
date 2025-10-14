@@ -1,23 +1,24 @@
-// Роуты для работы с пользователями - РАБОЧАЯ ВЕРСИЯ
+// Роуты для работы с пользователями - ИСПРАВЛЕННАЯ ВЕРСИЯ
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const Order = require('../models/Order'); 
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// ✅ ИСПРАВЛЕНО: Используем общий middleware
+//  Используем общий middleware
 const auth = require('../middleware/auth');
 
-// ✅ Настройка multer для загрузки файлов
+// Настройка multer для загрузки файлов
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const uploadDir = 'uploads/';
     if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+      fs.mkdirSync(uploadDir);
     }
     cb(null, uploadDir);
-  }
+  }, //  Запятая после destination
   filename: function (req, file, cb) {
     // Создаем уникальное имя файла: userId + timestamp + extension
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -39,7 +40,7 @@ const upload = multer({
   }
 });
 
-// ✅ Роут для загрузки аватара
+//  Роут для загрузки аватара
 router.post('/avatar', auth, upload.single('avatar'), async (req, res) => {
   try {
     if (!req.file) {
@@ -49,10 +50,20 @@ router.post('/avatar', auth, upload.single('avatar'), async (req, res) => {
       });
     }
 
-    // ✅ Создаем URL для аватара
-    const avatarUrl = `uploads/${req.file.filename}`;
+    //  Создаем URL для аватара
+    const avatarUrl = `http://localhost:3000/uploads/${req.file.filename}`;
 
-    // ✅ Обновляем пользователя в базе
+    //   Получаем текущего пользователя для удаления старого аватара
+    const user = await User.findById(req.user.id);
+    if (user.avatar) {
+      const oldAvatarPath = path.join(__dirname, '..', user.avatar); // Путь к старому файлу
+      if (fs.existsSync(oldAvatarPath)) {
+        fs.unlinkSync(oldAvatarPath); // Удаляем старый файл
+        console.log(`Старый аватар удален: ${oldAvatarPath}`);
+      }
+    }
+
+    //  Обновляем пользователя в базе
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
       { avatar: avatarUrl },
@@ -178,7 +189,7 @@ router.put('/profile', auth, async (req, res) => {
   }
 });
 
-// ✅ Получить всех пользователей (только для админа)
+//  Получить всех пользователей (только для админа)
 router.get('/admin/users', auth, async (req, res) => {
   try {
     // Проверяем права доступа
@@ -207,7 +218,7 @@ router.get('/admin/users', auth, async (req, res) => {
   }
 });
 
-// ✅ Создать пользователя (админ)
+//  Создать пользователя (админ)
 router.post('/admin/users', auth, async (req, res) => {
   try {
     if (req.user.role !== 'admin') {
@@ -287,7 +298,7 @@ router.post('/admin/users', auth, async (req, res) => {
   }
 });
 
-// ✅ Обновить роль пользователя (админ)
+//  Обновить роль пользователя (админ)
 router.patch('/admin/users/:id/role', auth, async (req, res) => {
   try {
     if (req.user.role !== 'admin') {
@@ -343,7 +354,7 @@ router.patch('/admin/users/:id/role', auth, async (req, res) => {
   }
 });
 
-// ✅ Переключить статус пользователя (админ)
+//  Переключить статус пользователя (админ)
 router.patch('/admin/users/:id/status', auth, async (req, res) => {
   try {
     if (req.user.role !== 'admin') {
@@ -396,7 +407,7 @@ router.patch('/admin/users/:id/status', auth, async (req, res) => {
   }
 });
 
-// ✅ Удалить пользователя (админ)
+//  Удалить пользователя (админ)
 router.delete('/admin/users/:id', auth, async (req, res) => {
   try {
     if (req.user.role !== 'admin') {

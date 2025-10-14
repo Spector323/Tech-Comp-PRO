@@ -91,7 +91,6 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    // Восстановление сессии при загрузке приложения
     initializeAuth() {
       const token = localStorage.getItem('token')
       const user = localStorage.getItem('user')
@@ -110,7 +109,6 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    // Проверка валидности токена
     async checkAuth() {
       if (!this.token) {
         return false
