@@ -94,7 +94,7 @@
             <div class="repair-progress" v-if="order.status === 'in_progress' || order.status === 'accepted'">
               <div class="progress-label">Прогресс ремонта:</div>
               <div class="progress-bar">
-                <div class="progress-fill" :style="{ width: `${(order.progress / 5) * 100}%` }"></div>
+                <div class="progress-fill" :style="{ width: `${(order.progress / 8) * 100}%` }"></div>
               </div>
               <div class="progress-steps">
                 <div v-for="step in progressSteps" :key="step.number" class="progress-step" :class="{

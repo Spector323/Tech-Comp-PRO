@@ -108,13 +108,6 @@
             </label>
           </div>
           <div class="setting-item">
-            <span>SMS уведомления</span>
-            <label class="switch">
-              <input type="checkbox" v-model="smsNotifications" @change="saveSettings" />
-              <span class="slider"></span>
-            </label>
-          </div>
-          <div class="setting-item">
             <span>Тема</span>
             <select v-model="theme" class="theme-select" @change="saveSettings">
               <option value="light">Светлая</option>
@@ -166,7 +159,6 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import { useToast } from 'vue-toastification'
-
 export default {
   name: 'ProfilePage',
 
@@ -227,8 +219,7 @@ export default {
 
     // Настройки
     const notificationsEnabled = ref(true)
-    const smsNotifications = ref(false)
-    const theme = ref('light')
+    const theme = ref('dark')
 
     // Компьютед свойства
     const filteredOrders = computed(() => {
@@ -289,8 +280,7 @@ export default {
         if (savedSettings) {
           const settings = JSON.parse(savedSettings)
           notificationsEnabled.value = settings.notificationsEnabled ?? true
-          smsNotifications.value = settings.smsNotifications ?? false
-          theme.value = settings.theme || 'light'
+          theme.value = settings.theme || 'dark'
         }
       } catch (err) {
         console.error('Ошибка загрузки настроек:', err)
@@ -410,7 +400,6 @@ export default {
     const saveSettings = () => {
       const settings = {
         notificationsEnabled: notificationsEnabled.value,
-        smsNotifications: smsNotifications.value,
         theme: theme.value
       }
       localStorage.setItem('userSettings', JSON.stringify(settings))
@@ -471,7 +460,6 @@ export default {
       progressSteps,
       statusLabels,
       notificationsEnabled,
-      smsNotifications,
       theme,
       openEditModal,
       closeEditModal,
@@ -489,35 +477,8 @@ export default {
   }
 }
 </script>
+
 <style scoped>
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 40px 24px;
-  color: #757575;
-  gap: 12px;
-}
-
-.spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #333;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 .profile-container {
   width: 100%;
   max-width: 1200px;
@@ -570,11 +531,6 @@ export default {
   height: 32px;
   cursor: pointer;
   font-size: 14px;
-  transition: background 0.2s;
-}
-
-.btn-avatar-edit:hover {
-  background: #555;
 }
 
 .profile-info h2 {
@@ -615,17 +571,21 @@ export default {
   padding: 0 30px;
 }
 
-.btn-edit {
+.btn-edit,
+.btn-logout {
   width: 100%;
   padding: 12px;
-  background: #f5f5f5;
-  color: #2d2d2d;
   border: none;
   border-radius: 12px;
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
   transition: background 0.2s;
+}
+
+.btn-edit {
+  background: #f5f5f5;
+  color: #2d2d2d;
 }
 
 .btn-edit:hover {
@@ -633,16 +593,8 @@ export default {
 }
 
 .btn-logout {
-  width: 100%;
-  padding: 12px;
   background: #ffebee;
   color: #c62828;
-  border: none;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
 }
 
 .btn-logout:hover {
@@ -864,14 +816,12 @@ export default {
   justify-content: center;
   font-weight: 600;
   font-size: 14px;
-  transition: all 0.3s;
 }
 
 .step-label {
   font-size: 12px;
   color: #757575;
   text-align: center;
-  transition: all 0.3s;
 }
 
 .progress-step.active .step-number {
@@ -889,7 +839,6 @@ export default {
   color: white;
 }
 
-/* Разделитель между шагами */
 .progress-step:not(:last-child)::after {
   content: '';
   position: absolute;
@@ -899,7 +848,6 @@ export default {
   height: 2px;
   background: #eaeaea;
   z-index: -1;
-  transition: background 0.3s;
 }
 
 .progress-step.active:not(:last-child)::after,
@@ -1104,24 +1052,23 @@ input:checked+.slider:before {
   border-color: #333;
 }
 
-.btn-cancel {
+.btn-cancel,
+.btn-save {
   padding: 10px 20px;
-  background: #f5f5f5;
-  color: #333;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
 }
 
+.btn-cancel {
+  background: #f5f5f5;
+  color: #333;
+}
+
 .btn-save {
-  padding: 10px 20px;
   background: #333;
   color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
 }
 
 .btn-cancel:hover {
@@ -1132,6 +1079,36 @@ input:checked+.slider:before {
   background: #555;
 }
 
+/* Загрузка */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 24px;
+  color: #757575;
+  gap: 12px;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #333;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Адаптив */
 @media (max-width: 968px) {
   .profile-container {
     flex-direction: column;

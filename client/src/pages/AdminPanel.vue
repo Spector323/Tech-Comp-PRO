@@ -5,9 +5,7 @@
             <div class="container">
                 <div class="hero-content">
                     <h1 class="hero-title">Админ-панель</h1>
-                    <p class="hero-subtitle">
-                        Полный контроль над системой и пользователями
-                    </p>
+                    <p class="hero-subtitle">Полный контроль над системой и пользователями</p>
                 </div>
             </div>
         </section>
@@ -17,32 +15,32 @@
             <div class="container">
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-icon">👥</div>
                         <div class="stat-info">
+                            <i class="pi pi-user" style="font-size: 2.5rem"></i>
                             <div class="stat-number">{{ stats.totalUsers }}</div>
-                            <div class="stat-label">Всего пользователей</div>
                         </div>
+                        <div class="stat-label">Всего пользователей</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">🔧</div>
                         <div class="stat-info">
+                            <i class="pi pi-spin pi-cog" style="font-size: 2rem"></i>
                             <div class="stat-number">{{ stats.masters }}</div>
-                            <div class="stat-label">Мастеров</div>
                         </div>
+                        <div class="stat-label">Мастеров</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">👔</div>
                         <div class="stat-info">
+                            <i class="pi pi-briefcase" style="font-size: 2.5rem"></i>
                             <div class="stat-number">{{ stats.managers }}</div>
-                            <div class="stat-label">Менеджеров</div>
                         </div>
+                        <div class="stat-label">Менеджеров</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">📋</div>
                         <div class="stat-info">
+                            <i class="pi pi-file" style="font-size: 2.5rem"></i>
                             <div class="stat-number">{{ stats.orders }}</div>
-                            <div class="stat-label">Заявок всего</div>
                         </div>
+                        <div class="stat-label">Заявок всего</div>
                     </div>
                 </div>
             </div>
@@ -55,10 +53,10 @@
                     <h2 class="section-title">Управление пользователями</h2>
                     <div class="section-actions">
                         <button @click="showUserModal = true" class="btn btn-primary">
-                            ➕ Добавить пользователя
+                            <i class="pi pi-plus"></i> Добавить пользователя
                         </button>
                         <input v-model="userSearch" type="text" placeholder="Поиск пользователей..."
-                            class="search-input">
+                            class="search-input" />
                     </div>
                 </div>
 
@@ -94,7 +92,7 @@
                                     <div class="user-info">
                                         <div class="user-avatar">
                                             <img :src="user.avatar || '/src/assets/avatar.png'" :alt="user.firstName"
-                                                @error="handleAvatarError">
+                                                @error="handleAvatarError" />
                                         </div>
                                         <div class="user-details">
                                             <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
@@ -112,9 +110,7 @@
                                         <option value="admin">Администратор</option>
                                     </select>
                                 </div>
-                                <div class="table-col">
-                                    {{ user.phone || 'Не указан' }}
-                                </div>
+                                <div class="table-col">{{ user.phone || 'Не указан' }}</div>
                                 <div class="table-col">
                                     <span class="status-badge" :class="user.isActive ? 'active' : 'inactive'">
                                         {{ user.isActive ? 'Активен' : 'Неактивен' }}
@@ -124,16 +120,16 @@
                                 <div class="table-col actions-col">
                                     <div class="action-buttons">
                                         <button @click="editUser(user)" class="btn-icon" title="Редактировать">
-                                            ✏️
+                                            <i class="pi pi-pencil" style="color: orange;"></i>
                                         </button>
                                         <button @click="toggleUserStatus(user)" class="btn-icon"
                                             :title="user.isActive ? 'Деактивировать' : 'Активировать'"
                                             :disabled="user._id === authStore.user?.id">
-                                            {{ user.isActive ? '⏸️' : '▶️' }}
+                                            <i :class="user.isActive ? 'pi pi-pause' : 'pi pi-play'"></i>
                                         </button>
                                         <button v-if="user._id !== authStore.user?.id" @click="deleteUser(user)"
                                             class="btn-icon danger" title="Удалить">
-                                            🗑️
+                                            <i class="pi pi-trash" style="color: red;"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -144,7 +140,7 @@
 
                 <!-- Пустое состояние -->
                 <div v-if="!loadingUsers && filteredUsers.length === 0" class="empty-state">
-                    <div class="empty-icon">👥</div>
+                    <i class="pi pi-users" style="font-size: 4rem; opacity: 0.5"></i>
                     <h3>Пользователи не найдены</h3>
                     <p>Попробуйте изменить критерии поиска</p>
                 </div>
@@ -161,7 +157,7 @@
                 <div class="roles-grid">
                     <div class="role-card">
                         <div class="role-header">
-                            <div class="role-icon">👥</div>
+                            <i class="pi pi-users" style="font-size: 2.5rem"></i>
                             <h3>Клиенты</h3>
                         </div>
                         <div class="role-stats">
@@ -182,7 +178,7 @@
 
                     <div class="role-card">
                         <div class="role-header">
-                            <div class="role-icon">🔧</div>
+                            <i class="pi pi-spin pi-cog" style="font-size: 2.2rem"></i>
                             <h3>Мастера</h3>
                         </div>
                         <div class="role-stats">
@@ -209,7 +205,7 @@
 
                     <div class="role-card">
                         <div class="role-header">
-                            <div class="role-icon">👔</div>
+                            <i class="pi pi-briefcase" style="font-size: 2.5rem"></i>
                             <h3>Менеджеры</h3>
                         </div>
                         <div class="role-stats">
@@ -249,24 +245,24 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Имя *</label>
-                            <input v-model="newUser.firstName" type="text" class="form-input" required>
+                            <input v-model="newUser.firstName" type="text" class="form-input" required />
                         </div>
                         <div class="form-group">
                             <label>Фамилия *</label>
-                            <input v-model="newUser.lastName" type="text" class="form-input" required>
+                            <input v-model="newUser.lastName" type="text" class="form-input" required />
                         </div>
                         <div class="form-group">
                             <label>Email *</label>
-                            <input v-model="newUser.email" type="email" class="form-input" required>
+                            <input v-model="newUser.email" type="email" class="form-input" required />
                         </div>
                         <div class="form-group">
                             <label>Пароль *</label>
-                            <input v-model="newUser.password" type="password" class="form-input" required>
+                            <input v-model="newUser.password" type="password" class="form-input" required />
                         </div>
                         <div class="form-group">
                             <label>Телефон</label>
                             <input v-model="newUser.phone" type="tel" class="form-input"
-                                placeholder="+7 (999) 999-99-99">
+                                placeholder="+7 (999) 999-99-99" />
                         </div>
                         <div class="form-group">
                             <label>Роль *</label>
@@ -292,9 +288,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button @click="showUserModal = false" class="btn btn-outline">
-                        Отмена
-                    </button>
+                    <button @click="showUserModal = false" class="btn btn-outline">Отмена</button>
                     <button @click="createUser" class="btn btn-primary" :disabled="!isFormValid">
                         Создать пользователя
                     </button>
@@ -340,7 +334,6 @@ export default {
             { key: 'admin', label: 'Администраторы' }
         ]
 
-        // ✅ Загрузка реальных пользователей
         const loadUsers = async () => {
             try {
                 loadingUsers.value = true
@@ -355,7 +348,6 @@ export default {
             }
         }
 
-        // ✅ Загрузка всех заявок для статистики
         const loadAllOrders = async () => {
             try {
                 const response = await orderService.getMyOrders()
@@ -365,16 +357,11 @@ export default {
             }
         }
 
-        // ✅ Создание пользователя через API
         const createUser = async () => {
             try {
                 const response = await adminService.createUser(newUser.value)
-
-                // Добавляем нового пользователя в список
                 users.value.unshift(response.user)
                 showUserModal.value = false
-
-                // Сброс формы
                 newUser.value = {
                     firstName: '',
                     lastName: '',
@@ -384,7 +371,6 @@ export default {
                     role: 'client',
                     specialization: ''
                 }
-
                 alert(response.message)
             } catch (error) {
                 console.error('Ошибка создания пользователя:', error)
@@ -392,14 +378,12 @@ export default {
             }
         }
 
-        // ✅ Обновление роли через API
         const updateUserRole = async (user, newRole) => {
             try {
                 const roleData = { role: newRole }
                 if (newRole === 'master') {
                     roleData.specialization = user.specialization || 'Общая'
                 }
-
                 const response = await adminService.updateUserRole(user._id, roleData)
                 user.role = newRole
                 alert(response.message)
@@ -409,7 +393,6 @@ export default {
             }
         }
 
-        // ✅ Переключение статуса через API
         const toggleUserStatus = async (user) => {
             try {
                 const response = await adminService.toggleUserStatus(user._id)
@@ -421,7 +404,6 @@ export default {
             }
         }
 
-        // ✅ Удаление пользователя через API
         const deleteUser = async (user) => {
             if (confirm(`Удалить пользователя ${user.firstName} ${user.lastName}?`)) {
                 try {
@@ -435,16 +417,11 @@ export default {
             }
         }
 
-        // Компьютед свойства
         const filteredUsers = computed(() => {
             let filtered = users.value
-
-            // Фильтрация по роли
             if (currentRoleFilter.value !== 'all') {
                 filtered = filtered.filter(user => user.role === currentRoleFilter.value)
             }
-
-            // Поиск
             if (userSearch.value) {
                 const query = userSearch.value.toLowerCase()
                 filtered = filtered.filter(user =>
@@ -454,27 +431,22 @@ export default {
                     (user.phone && user.phone.toLowerCase().includes(query))
                 )
             }
-
             return filtered
         })
 
-        // Мастера
         const masters = computed(() => {
             return users.value.filter(user => user.role === 'master' && user.isActive)
         })
 
-        // Менеджеры
         const managers = computed(() => {
             return users.value.filter(user => user.role === 'manager' && user.isActive)
         })
 
-        // Статистика
         const stats = computed(() => {
             const totalUsers = users.value.length
             const mastersCount = users.value.filter(user => user.role === 'master').length
             const managersCount = users.value.filter(user => user.role === 'manager').length
             const ordersCount = allOrders.value.length
-
             return {
                 totalUsers,
                 masters: mastersCount,
@@ -483,13 +455,11 @@ export default {
             }
         })
 
-        // Статистика по ролям
         const roleStats = computed(() => {
             const clients = users.value.filter(user => user.role === 'client')
             const masters = users.value.filter(user => user.role === 'master')
             const managers = users.value.filter(user => user.role === 'manager')
 
-            // Подсчет заявок для клиентов
             const clientOrders = allOrders.value.reduce((acc, order) => {
                 acc[order.user] = (acc[order.user] || 0) + 1
                 return acc
@@ -514,16 +484,16 @@ export default {
             }
         })
 
-        // Валидация формы
         const isFormValid = computed(() => {
-            return newUser.value.firstName &&
+            return (
+                newUser.value.firstName &&
                 newUser.value.lastName &&
                 newUser.value.email &&
                 newUser.value.password &&
                 newUser.value.role
+            )
         })
 
-        // Методы
         const setRoleFilter = (filter) => {
             currentRoleFilter.value = filter
         }
@@ -546,17 +516,12 @@ export default {
             return new Date(dateString).toLocaleDateString('ru-RU')
         }
 
-        // Загрузка данных при монтировании
         onMounted(async () => {
             if (authStore.userRole !== 'admin') {
                 alert('Доступ запрещен')
                 return
             }
-
-            await Promise.all([
-                loadUsers(),
-                loadAllOrders()
-            ])
+            await Promise.all([loadUsers(), loadAllOrders()])
         })
 
         return {
@@ -635,6 +600,7 @@ export default {
 
 .stat-card {
     display: flex;
+    flex-direction: column;
     align-items: center;
     padding: 2rem;
     background: white;
@@ -643,7 +609,11 @@ export default {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
 }
-
+.stat-info {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
 .stat-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
@@ -658,7 +628,6 @@ export default {
     font-size: 2.5rem;
     font-weight: 600;
     color: #1a1a1a;
-    margin-bottom: 0.5rem;
 }
 
 .stat-label {

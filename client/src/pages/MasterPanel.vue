@@ -168,7 +168,7 @@
                 <div class="progress-bar">
                   <div 
                     class="progress-fill" 
-                    :style="{ width: `${(order.progress / 5) * 100}%` }"
+                    :style="{ width: `${(order.progress / 8) * 100}%` }"
                   ></div>
                 </div>
                 <div class="progress-steps">
