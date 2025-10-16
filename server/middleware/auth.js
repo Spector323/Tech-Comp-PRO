@@ -1,38 +1,22 @@
-// Middleware для проверки JWT токена
-
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const auth = async (req, res, next) => {
   try {
-    // Получаем токен из заголовка
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    
-    if (!token) {
-      return res.status(401).json({ 
-        message: 'Нет токена, доступ запрещен' 
-      });
+    const authHeader = req.header('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: 'Нет токена, доступ запрещён' });
     }
-
-    // Проверяем токен
+    const token = authHeader.replace('Bearer ', '');
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    // Находим пользователя
-    const user = await User.findById(decoded.userId);
+    const user = await User.findById(decoded.userId).select('+password');
     if (!user) {
-      return res.status(401).json({ 
-        message: 'Токен недействителен' 
-      });
+      return res.status(401).json({ message: 'Токен недействителен' });
     }
-
-    // Добавляем пользователя в запрос
     req.user = user;
     next();
-
   } catch (error) {
-    res.status(401).json({ 
-      message: 'Токен недействителен' 
-    });
+    res.status(401).json({ message: 'Токен недействителен' });
   }
 };
 

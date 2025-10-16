@@ -1,5 +1,3 @@
-// Модель пользователя - описывает структуру данных пользователя в базе
-
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const userSchema = new mongoose.Schema({
@@ -28,11 +26,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Пароль обязателен'],
     minlength: 6,
-    select: false
+    select: false 
   },
   avatar: {
     type: String,
-    default: '/avatar.png' // Путь к изображению по умолчанию
+    default: '/avatar.png'
   },
   role: {
     type: String,
@@ -40,7 +38,7 @@ const userSchema = new mongoose.Schema({
     default: 'client'
   },
   specialization: {
-    type: String, // Для мастеров: "Ноутбуки", "Телефоны", "Компьютеры"
+    type: String,
     default: ''
   },
   isActive: {
@@ -50,16 +48,14 @@ const userSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
-// Шифруем пароль перед сохранением
+// Хеширование пароля перед сохранением
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
-  
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
-
-// Метод для проверки пароля
+// Метод проверки пароля
 userSchema.methods.checkPassword = async function(password) {
   return await bcrypt.compare(password, this.password);
 };
