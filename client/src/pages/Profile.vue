@@ -1,4 +1,4 @@
-<template>
+<template>  
   <div class="profile-container">
     <!-- Левая колонка: профиль -->
     <div class="profile-card">
@@ -325,6 +325,21 @@ export default {
 
     const triggerAvatarUpload = () => {
       document.querySelector('input[type="file"]').click()
+    }
+
+    const loadOrders = async () => {
+      try {
+        loading.value = true
+        console.log('Загружаем заявки с сервера...')
+        const response = await orderService.getMyOrders()
+        orders.value = response
+        console.log('Заявки загружены:', orders.value.length)
+      } catch (error) {
+        console.error('Ошибка загрузки заявок:', error)
+        alert('Ошибка загрузки заявок: ' + error.message)
+      } finally {
+        loading.value = false
+      }
     }
 
     const handleAvatarUpload = async (event) => {

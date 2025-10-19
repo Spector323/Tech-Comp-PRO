@@ -232,9 +232,7 @@ export default {
   transition: transform 0.3s ease;
 }
 
-.logo-link:hover {
-  transform: scale(1.05);
-}
+
 
 .logo-pro {
   background: linear-gradient(135deg, #1a1a1a, #333);

@@ -599,7 +599,7 @@ export default {
 
 /* Hero секция */
 .page-hero {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #333 0%, #666 100%);
   color: white;
   padding: 4rem 0 3rem;
   position: relative;
@@ -613,7 +613,6 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
 .hero-content {
@@ -674,11 +673,10 @@ export default {
   left: 0;
   width: 4px;
   height: 100%;
-  background: var(--accent-color, #667eea);
+  background: var(--accent-color, #333);
 }
 
 .stat-card:hover {
-  transform: translateY(-5px);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
@@ -743,7 +741,7 @@ export default {
 
 .search-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #333;
 }
 
 /* Фильтры */
@@ -771,13 +769,13 @@ export default {
 }
 
 .filter-btn:hover {
-  border-color: #667eea;
-  color: #667eea;
+  border-color: #333;
+  color: #333;
 }
 
 .filter-btn.active {
-  background: #667eea;
-  border-color: #667eea;
+  background: #333;
+  border-color: #333;
   color: white;
 }
 
@@ -814,9 +812,7 @@ export default {
   background: var(--status-color, #6c757d);
 }
 
-.order-card:hover {
-  background: #f8f9fa;
-}
+
 
 .order-card:last-child {
   border-bottom: none;
@@ -860,7 +856,7 @@ export default {
 .client-avatar {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #333, #666);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -946,7 +942,7 @@ export default {
   padding: 1.5rem;
   background: #f8f9fa;
   border-radius: 8px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #333;
 }
 
 .detail-row {
@@ -1041,8 +1037,8 @@ export default {
 }
 
 .btn-primary {
-  background: #667eea;
-  border-color: #667eea;
+  background: #333;
+  border-color: #333;
   color: white;
 }
 
@@ -1075,12 +1071,12 @@ export default {
 
 .btn-outline {
   background: transparent;
-  border-color: #667eea;
-  color: #667eea;
+  border-color: #333;
+  color: #333;
 }
 
 .btn-outline:hover {
-  background: #667eea;
+  background: #333;
   color: white;
 }
 
@@ -1207,7 +1203,7 @@ export default {
   padding: 1.5rem;
   background: #f8f9fa;
   border-radius: 12px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #333;
 }
 
 .detail-section.full-width {
@@ -1310,13 +1306,13 @@ export default {
 
 .master-item:hover {
   background: #e9ecef;
-  border-color: #667eea;
+  border-color: #333;
 }
 
 .master-avatar {
   width: 50px;
   height: 50px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #333, #666);
   border-radius: 50%;
   display: flex;
   align-items: center;

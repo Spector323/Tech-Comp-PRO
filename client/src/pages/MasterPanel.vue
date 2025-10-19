@@ -682,7 +682,7 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
 
 /* Hero секция */
 .page-hero {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    background: linear-gradient(135deg, #333 0%, #666 100%);
     color: white;
     padding: 4rem 0 3rem;
     position: relative;
@@ -696,7 +696,6 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
     left: 0;
     right: 0;
     bottom: 0;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
 .hero-content {
@@ -757,11 +756,10 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
     left: 0;
     width: 4px;
     height: 100%;
-    background: var(--accent-color, #059669);
+    background: var(--accent-color, #333);
 }
 
 .stat-card:hover {
-    transform: translateY(-5px);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
@@ -833,7 +831,7 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
 
 .search-input:focus {
     outline: none;
-    border-color: #059669;
+    border-color: #333;
 }
 
 /* Контейнер заявок */
@@ -869,28 +867,26 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
     background: var(--status-color, #6c757d);
 }
 
-.order-card:hover {
-    background: #f8f9fa;
-}
+
 
 .order-card:last-child {
     border-bottom: none;
 }
 
 .order-card.my-order {
-    border-left: 4px solid #059669;
+    border-left: 4px solid #333;
     background: #f0fdf4;
 }
 
 .order-card.my-order::before {
-    background: #059669;
+    background: #333;
 }
 
 .order-badge {
     position: absolute;
     top: 1rem;
     right: 1rem;
-    background: #059669;
+    background: #333;
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 20px;
@@ -939,7 +935,7 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
 .client-avatar {
     width: 48px;
     height: 48px;
-    background: linear-gradient(135deg, #059669, #047857);
+    background: linear-gradient(135deg, #333, #666);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -1006,7 +1002,7 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
 .status-completed {
     background: #e8f5e8;
     color: #2e7d32;
-    --status-color: #059669;
+    --status-color: #333;
 }
 
 .order-date,
@@ -1047,7 +1043,7 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
     padding: 1.5rem;
     background: #f8f9fa;
     border-radius: 8px;
-    border-left: 4px solid #059669;
+    border-left: 4px solid #333;
 }
 
 .detail-row {
@@ -1103,14 +1099,14 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
 }
 
 .btn-primary {
-    background: #059669;
-    border-color: #059669;
+    background: #333;
+    border-color: #333;
     color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: #047857;
-    border-color: #047857;
+    background: #666;
+    border-color: #666;
 }
 
 .btn-success {
@@ -1120,19 +1116,19 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
 }
 
 .btn-success:hover {
-    background: #059669;
-    border-color: #059669;
+    background: #333;
+    border-color: #333;
 }
 
 .btn-complete {
-    background: #059669;
-    border-color: #059669;
+    background: #333;
+    border-color: #333;
     color: white;
 }
 
 .btn-complete:hover {
-    background: #047857;
-    border-color: #047857;
+    background: #666;
+    border-color: #666;
 }
 
 .btn-danger {
@@ -1148,12 +1144,12 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
 
 .btn-outline {
     background: transparent;
-    border-color: #059669;
-    color: #059669;
+    border-color: #333;
+    color: #333;
 }
 
 .btn-outline:hover {
-    background: #059669;
+    background: #333;
     color: white;
 }
 
@@ -1196,7 +1192,7 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
 .btn-link {
     background: none;
     border: none;
-    color: #059669;
+    color: #333;
     cursor: pointer;
     text-decoration: underline;
     font-size: 0.9rem;
@@ -1204,7 +1200,7 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
 }
 
 .btn-link:hover {
-    color: #047857;
+    color: #666;
 }
 
 /* Прогресс */
@@ -1213,7 +1209,7 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
     padding: 1.5rem;
     background: #f8f9fa;
     border-radius: 8px;
-    border-left: 4px solid #059669;
+    border-left: 4px solid #333;
 }
 
 .progress-header {
@@ -1230,7 +1226,7 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
 
 .progress-percent {
     font-weight: 600;
-    color: #059669;
+    color: #333;
     font-size: 1.1rem;
 }
 
@@ -1244,7 +1240,7 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
 
 .progress-fill {
     height: 100%;
-    background: #059669;
+    background: #333;
     transition: width 0.3s ease;
 }
 
@@ -1274,7 +1270,7 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
 }
 
 .progress-step.active .step-dot {
-    background: #059669;
+    background: #333;
     transform: scale(1.2);
 }
 
@@ -1308,7 +1304,7 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
 .order-price-large {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #059669;
+    color: #333;
     margin-top: 0.5rem;
 }
 
@@ -1382,7 +1378,7 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
     padding: 1.5rem;
     background: #f8f9fa;
     border-radius: 8px;
-    border-left: 4px solid #059669;
+    border-left: 4px solid #333;
 }
 
 .order-preview h4 {
@@ -1426,7 +1422,7 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
 
 .form-input:focus {
     outline: none;
-    border-color: #059669;
+    border-color: #333;
 }
 
 .price-suggestions {
@@ -1460,16 +1456,16 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
 }
 
 .btn-suggestion:hover {
-    border-color: #059669;
+    border-color: #333;
     background: #f0fdf4;
-    color: #059669;
+    color: #333;
 }
 
 .price-preview {
     padding: 1.5rem;
     background: #f8f9fa;
     border-radius: 8px;
-    border-left: 4px solid #059669;
+    border-left: 4px solid #333;
 }
 
 .preview-item {
@@ -1490,7 +1486,7 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
 
 .total-price {
     font-size: 1.2rem;
-    color: #059669;
+    color: #333;
 }
 
 .modal-footer {
@@ -1607,12 +1603,10 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(20px);
     }
 
     to {
         opacity: 1;
-        transform: translateY(0);
     }
 }
 

@@ -4,7 +4,10 @@
         <section class="page-hero">
             <div class="container">
                 <div class="hero-content">
-                    <h1 class="hero-title">Админ-панель</h1>
+                    <h1 class="hero-title">
+                        <i class="pi pi-shield"></i>
+                        Админ-панель
+                    </h1>
                     <p class="hero-subtitle">Полный контроль над системой и пользователями</p>
                 </div>
             </div>
@@ -23,7 +26,7 @@
                     </div>
                     <div class="stat-card">
                         <div class="stat-info">
-                            <i class="pi pi-spin pi-cog" style="font-size: 2rem"></i>
+                            <i class="pi pi-cog" style="font-size: 2.5rem"></i>
                             <div class="stat-number">{{ stats.masters }}</div>
                         </div>
                         <div class="stat-label">Мастеров</div>
@@ -50,13 +53,19 @@
         <section class="users-section">
             <div class="container">
                 <div class="section-header">
-                    <h2 class="section-title">Управление пользователями</h2>
+                    <h2 class="section-title">
+                        <i class="pi pi-users"></i>
+                        Управление пользователями
+                    </h2>
                     <div class="section-actions">
                         <button @click="showUserModal = true" class="btn btn-primary">
-                            <i class="pi pi-plus"></i> Добавить пользователя
+                            <i class="pi pi-plus"></i> 
+                            Добавить пользователя
                         </button>
-                        <input v-model="userSearch" type="text" placeholder="Поиск пользователей..."
-                            class="search-input" />
+                        <div class="search-box">
+                            <input v-model="userSearch" type="text" placeholder="Поиск пользователей..." class="search-input" />
+                            <i class="pi pi-search search-icon"></i>
+                        </div>
                     </div>
                 </div>
 
@@ -64,6 +73,7 @@
                 <div class="role-filters">
                     <button v-for="filter in roleFilters" :key="filter.key" @click="setRoleFilter(filter.key)"
                         :class="['filter-btn', { active: currentRoleFilter === filter.key }]">
+                        <i :class="filter.icon"></i>
                         {{ filter.label }}
                     </button>
                 </div>
@@ -82,7 +92,9 @@
                         </div>
 
                         <div v-if="loadingUsers" class="loading-state">
-                            <div class="spinner"></div>
+                            <div class="spinner">
+                                <i class="pi pi-spinner pi-spin" style="font-size: 2rem"></i>
+                            </div>
                             <span>Загружаем пользователей...</span>
                         </div>
 
@@ -96,11 +108,17 @@
                                         </div>
                                         <div class="user-details">
                                             <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
-                                            <span class="user-id">ID: {{ user._id.slice(-6) }}</span>
+                                            <span class="user-id">
+                                                <i class="pi pi-id-card"></i>
+                                                ID: {{ user._id.slice(-6) }}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="table-col">{{ user.email }}</div>
+                                <div class="table-col">
+                                    <i class="pi pi-envelope"></i>
+                                    {{ user.email }}
+                                </div>
                                 <div class="table-col">
                                     <select :value="user.role" @change="updateUserRole(user, $event.target.value)"
                                         class="role-select" :disabled="user._id === authStore.user?.id">
@@ -110,17 +128,24 @@
                                         <option value="admin">Администратор</option>
                                     </select>
                                 </div>
-                                <div class="table-col">{{ user.phone || 'Не указан' }}</div>
+                                <div class="table-col">
+                                    <i class="pi pi-phone"></i>
+                                    {{ user.phone || 'Не указан' }}
+                                </div>
                                 <div class="table-col">
                                     <span class="status-badge" :class="user.isActive ? 'active' : 'inactive'">
+                                        <i :class="user.isActive ? 'pi pi-check-circle' : 'pi pi-times-circle'"></i>
                                         {{ user.isActive ? 'Активен' : 'Неактивен' }}
                                     </span>
                                 </div>
-                                <div class="table-col">{{ formatDate(user.createdAt) }}</div>
+                                <div class="table-col">
+                                    <i class="pi pi-calendar"></i>
+                                    {{ formatDate(user.createdAt) }}
+                                </div>
                                 <div class="table-col actions-col">
                                     <div class="action-buttons">
                                         <button @click="editUser(user)" class="btn-icon" title="Редактировать">
-                                            <i class="pi pi-pencil" style="color: orange;"></i>
+                                            <i class="pi pi-pencil"></i>
                                         </button>
                                         <button @click="toggleUserStatus(user)" class="btn-icon"
                                             :title="user.isActive ? 'Деактивировать' : 'Активировать'"
@@ -129,7 +154,7 @@
                                         </button>
                                         <button v-if="user._id !== authStore.user?.id" @click="deleteUser(user)"
                                             class="btn-icon danger" title="Удалить">
-                                            <i class="pi pi-trash" style="color: red;"></i>
+                                            <i class="pi pi-trash"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -140,7 +165,7 @@
 
                 <!-- Пустое состояние -->
                 <div v-if="!loadingUsers && filteredUsers.length === 0" class="empty-state">
-                    <i class="pi pi-users" style="font-size: 4rem; opacity: 0.5"></i>
+                    <i class="pi pi-users" style="font-size: 4rem"></i>
                     <h3>Пользователи не найдены</h3>
                     <p>Попробуйте изменить критерии поиска</p>
                 </div>
@@ -151,7 +176,10 @@
         <section class="roles-section">
             <div class="container">
                 <div class="section-header">
-                    <h2 class="section-title">Статистика по ролям</h2>
+                    <h2 class="section-title">
+                        <i class="pi pi-chart-bar"></i>
+                        Статистика по ролям
+                    </h2>
                 </div>
 
                 <div class="roles-grid">
@@ -178,7 +206,7 @@
 
                     <div class="role-card">
                         <div class="role-header">
-                            <i class="pi pi-spin pi-cog" style="font-size: 2.2rem"></i>
+                            <i class="pi pi-cog" style="font-size: 2.5rem"></i>
                             <h3>Мастера</h3>
                         </div>
                         <div class="role-stats">
@@ -237,35 +265,58 @@
         <div v-if="showUserModal" class="modal-overlay" @click="showUserModal = false">
             <div class="modal-content" @click.stop>
                 <div class="modal-header">
-                    <h3>Добавить пользователя</h3>
-                    <button @click="showUserModal = false" class="close-btn">×</button>
+                    <h3>
+                        <i class="pi pi-user-plus"></i>
+                        Добавить пользователя
+                    </h3>
+                    <button @click="showUserModal = false" class="close-btn">
+                        <i class="pi pi-times"></i>
+                    </button>
                 </div>
 
                 <div class="modal-body">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Имя *</label>
+                            <label>
+                                <i class="pi pi-user"></i>
+                                Имя *
+                            </label>
                             <input v-model="newUser.firstName" type="text" class="form-input" required />
                         </div>
                         <div class="form-group">
-                            <label>Фамилия *</label>
+                            <label>
+                                <i class="pi pi-user"></i>
+                                Фамилия *
+                            </label>
                             <input v-model="newUser.lastName" type="text" class="form-input" required />
                         </div>
                         <div class="form-group">
-                            <label>Email *</label>
+                            <label>
+                                <i class="pi pi-envelope"></i>
+                                Email *
+                            </label>
                             <input v-model="newUser.email" type="email" class="form-input" required />
                         </div>
                         <div class="form-group">
-                            <label>Пароль *</label>
+                            <label>
+                                <i class="pi pi-lock"></i>
+                                Пароль *
+                            </label>
                             <input v-model="newUser.password" type="password" class="form-input" required />
                         </div>
                         <div class="form-group">
-                            <label>Телефон</label>
+                            <label>
+                                <i class="pi pi-phone"></i>
+                                Телефон
+                            </label>
                             <input v-model="newUser.phone" type="tel" class="form-input"
                                 placeholder="+7 (999) 999-99-99" />
                         </div>
                         <div class="form-group">
-                            <label>Роль *</label>
+                            <label>
+                                <i class="pi pi-shield"></i>
+                                Роль *
+                            </label>
                             <select v-model="newUser.role" class="form-input" required @change="onRoleChange">
                                 <option value="client">Клиент</option>
                                 <option value="master">Мастер</option>
@@ -274,7 +325,10 @@
                             </select>
                         </div>
                         <div class="form-group" v-if="newUser.role === 'master'">
-                            <label>Специализация</label>
+                            <label>
+                                <i class="pi pi-wrench"></i>
+                                Специализация
+                            </label>
                             <select v-model="newUser.specialization" class="form-input">
                                 <option value="">Общая специализация</option>
                                 <option value="Ноутбуки">Ноутбуки</option>
@@ -288,8 +342,12 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button @click="showUserModal = false" class="btn btn-outline">Отмена</button>
+                    <button @click="showUserModal = false" class="btn btn-outline">
+                        <i class="pi pi-times"></i>
+                        Отмена
+                    </button>
                     <button @click="createUser" class="btn btn-primary" :disabled="!isFormValid">
+                        <i class="pi pi-check"></i>
                         Создать пользователя
                     </button>
                 </div>
@@ -327,11 +385,11 @@ export default {
         })
 
         const roleFilters = [
-            { key: 'all', label: 'Все пользователи' },
-            { key: 'client', label: 'Клиенты' },
-            { key: 'master', label: 'Мастера' },
-            { key: 'manager', label: 'Менеджеры' },
-            { key: 'admin', label: 'Администраторы' }
+            { key: 'all', label: 'Все пользователи', icon: 'pi pi-users' },
+            { key: 'client', label: 'Клиенты', icon: 'pi pi-user' },
+            { key: 'master', label: 'Мастера', icon: 'pi pi-cog' },
+            { key: 'manager', label: 'Менеджеры', icon: 'pi pi-briefcase' },
+            { key: 'admin', label: 'Администраторы', icon: 'pi pi-shield' }
         ]
 
         const loadUsers = async () => {
@@ -559,31 +617,56 @@ export default {
 .panel-page {
     background: #f8f9fa;
     min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
 }
 
 /* Hero секция */
 .page-hero {
-    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    background: linear-gradient(135deg, #333 0%, #666 100%);
     color: white;
     padding: 4rem 0 3rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.page-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
 .hero-content {
     text-align: center;
     max-width: 600px;
     margin: 0 auto;
+    position: relative;
+    z-index: 1;
 }
 
 .hero-title {
     font-size: 2.5rem;
-    font-weight: 300;
+    font-weight: 700;
     margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
 }
 
 .hero-subtitle {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     opacity: 0.9;
     line-height: 1.6;
+    font-weight: 300;
 }
 
 /* Статистика */
@@ -595,44 +678,55 @@ export default {
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
+    gap: 2rem;
 }
 
 .stat-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2rem;
+    padding: 2.5rem 2rem;
     background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     border: 1px solid #f0f0f0;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
-}
-.stat-info {
-    display: flex;
-    gap: 5px;
-    align-items: center;
-}
-.stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
 }
 
-.stat-icon {
-    font-size: 3rem;
-    margin-right: 1.5rem;
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--accent-color, #333);
+}
+
+.stat-card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.stat-info {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .stat-number {
     font-size: 2.5rem;
-    font-weight: 600;
+    font-weight: 700;
     color: #1a1a1a;
 }
 
 .stat-label {
     color: #666;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-align: center;
 }
 
 /* Секция пользователей */
@@ -644,7 +738,7 @@ export default {
 .section-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 2rem;
     flex-wrap: wrap;
     gap: 1rem;
@@ -652,8 +746,11 @@ export default {
 
 .section-title {
     font-size: 2rem;
-    font-weight: 300;
+    font-weight: 700;
     color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .section-actions {
@@ -662,17 +759,31 @@ export default {
     align-items: center;
 }
 
+.search-box {
+    position: relative;
+    flex: 1;
+    max-width: 300px;
+}
+
 .search-input {
-    padding: 0.75rem 1rem;
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
     border: 1px solid #e1e1e1;
     border-radius: 8px;
     font-size: 0.9rem;
-    min-width: 250px;
+    transition: border-color 0.3s ease;
 }
 
 .search-input:focus {
     outline: none;
-    border-color: #1a1a1a;
+    border-color: #333;
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    color: #666;
 }
 
 /* Фильтры ролей */
@@ -691,16 +802,20 @@ export default {
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .filter-btn:hover {
-    border-color: #1a1a1a;
+    border-color: #333;
+    color: #333;
 }
 
 .filter-btn.active {
-    background: #1a1a1a;
+    background: #333;
+    border-color: #333;
     color: white;
-    border-color: #1a1a1a;
 }
 
 /* Таблица пользователей */
@@ -753,6 +868,7 @@ export default {
 .table-col {
     display: flex;
     align-items: center;
+    gap: 0.5rem;
 }
 
 .user-col {
@@ -771,14 +887,15 @@ export default {
 }
 
 .user-avatar {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     overflow: hidden;
     background: #f8f9fa;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .user-avatar img {
@@ -801,6 +918,9 @@ export default {
 .user-id {
     font-size: 0.8rem;
     color: #666;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 
 /* Селектор роли */
@@ -811,16 +931,18 @@ export default {
     background: white;
     font-size: 0.9rem;
     min-width: 120px;
+    transition: border-color 0.3s ease;
 }
 
 .role-select:focus {
     outline: none;
-    border-color: #1a1a1a;
+    border-color: #333;
 }
 
 .role-select:disabled {
     background: #f8f9fa;
     color: #666;
+    cursor: not-allowed;
 }
 
 /* Бейдж статуса */
@@ -829,6 +951,9 @@ export default {
     border-radius: 20px;
     font-size: 0.8rem;
     font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 
 .status-badge.active {
@@ -853,21 +978,29 @@ export default {
     padding: 0.5rem;
     cursor: pointer;
     border-radius: 6px;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease;
     font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
 }
 
 .btn-icon:hover {
     background: #f8f9fa;
+    transform: scale(1.1);
 }
 
 .btn-icon.danger:hover {
     background: #f8d7da;
+    color: #333;
 }
 
 .btn-icon:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
 }
 
 /* Секция ролей */
@@ -885,9 +1018,14 @@ export default {
 .role-card {
     background: white;
     border: 1px solid #f0f0f0;
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 2rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.role-card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
 .role-header {
@@ -895,10 +1033,8 @@ export default {
     align-items: center;
     gap: 1rem;
     margin-bottom: 1.5rem;
-}
-
-.role-icon {
-    font-size: 2.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f0f0f0;
 }
 
 .role-header h3 {
@@ -919,12 +1055,17 @@ export default {
     padding: 1rem;
     background: #f8f9fa;
     border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.role-stat:hover {
+    background: #e9ecef;
 }
 
 .stat-value {
     display: block;
     font-size: 1.5rem;
-    font-weight: 600;
+    font-weight: 700;
     color: #1a1a1a;
     margin-bottom: 0.25rem;
 }
@@ -932,6 +1073,7 @@ export default {
 .stat-label {
     font-size: 0.8rem;
     color: #666;
+    font-weight: 500;
 }
 
 /* Списки мастеров и менеджеров */
@@ -950,6 +1092,12 @@ export default {
     padding: 0.75rem;
     background: #f8f9fa;
     border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.master-item:hover,
+.manager-item:hover {
+    background: #e9ecef;
 }
 
 .master-name,
@@ -964,6 +1112,7 @@ export default {
     background: white;
     padding: 0.25rem 0.5rem;
     border-radius: 12px;
+    font-weight: 500;
 }
 
 .manager-email {
@@ -988,12 +1137,12 @@ export default {
 
 .modal-content {
     background: white;
-    border-radius: 12px;
-    width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
     max-width: 600px;
+    width: 100%;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .modal-header {
@@ -1001,38 +1150,40 @@ export default {
     justify-content: space-between;
     align-items: center;
     padding: 2rem 2rem 1rem;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #e9ecef;
 }
 
 .modal-header h3 {
     margin: 0;
-    color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     font-size: 1.5rem;
 }
 
 .close-btn {
     background: none;
     border: none;
-    font-size: 2rem;
+    font-size: 1.5rem;
     cursor: pointer;
     color: #666;
-    padding: 0;
-    width: 40px;
-    height: 40px;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    transition: background 0.3s ease;
+    width: 40px;
+    height: 40px;
 }
 
 .close-btn:hover {
-    background: #f5f5f5;
-    color: #1a1a1a;
+    background: #f8f9fa;
+    color: #333;
 }
 
 .modal-body {
-    padding: 2rem;
+    padding: 1rem 2rem 2rem;
 }
 
 .modal-footer {
@@ -1053,6 +1204,7 @@ export default {
 .form-group {
     display: flex;
     flex-direction: column;
+    gap: 0.5rem;
 }
 
 .form-group:last-child:nth-child(odd) {
@@ -1060,29 +1212,36 @@ export default {
 }
 
 .form-group label {
-    margin-bottom: 0.5rem;
-    font-weight: 500;
+    font-weight: 600;
     color: #1a1a1a;
     font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .form-input {
     padding: 0.75rem 1rem;
-    border: 1px solid #e1e1e1;
+    border: 2px solid #e1e1e1;
     border-radius: 8px;
     font-size: 1rem;
     transition: border-color 0.3s ease;
+    font-family: inherit;
 }
 
 .form-input:focus {
     outline: none;
-    border-color: #1a1a1a;
+    border-color: #333;
+}
+
+.form-input::placeholder {
+    color: #999;
 }
 
 /* Кнопки */
 .btn {
     padding: 0.75rem 1.5rem;
-    border: 1px solid #1a1a1a;
+    border: 1px solid;
     background: transparent;
     color: #1a1a1a;
     text-decoration: none;
@@ -1098,26 +1257,32 @@ export default {
 }
 
 .btn-primary {
-    background: #1a1a1a;
+    background: #333;
+    border-color: #333;
     color: white;
 }
 
-.btn-primary:hover {
-    background: #333;
+.btn-primary:hover:not(:disabled) {
+    background: #666;
+    border-color: #666;
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
 }
 
 .btn-outline {
     background: transparent;
-    color: #1a1a1a;
+    border-color: #333;
+    color: #333;
 }
 
 .btn-outline:hover {
-    background: #f8f9fa;
+    background: #333;
+    color: white;
 }
 
 .btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+    transform: none !important;
 }
 
 /* Состояния */
@@ -1134,7 +1299,7 @@ export default {
     width: 40px;
     height: 40px;
     border: 3px solid #f3f3f3;
-    border-top: 3px solid #1a1a1a;
+    border-top: 3px solid #333;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -1156,18 +1321,19 @@ export default {
 }
 
 .empty-icon {
-    font-size: 4rem;
     margin-bottom: 1.5rem;
     opacity: 0.5;
 }
 
 .empty-state h3 {
     margin: 0 0 1rem 0;
-    color: #1a1a1a;
+    color: #333;
+    font-size: 1.5rem;
 }
 
 .empty-state p {
     margin: 0;
+    font-size: 1rem;
 }
 
 /* Адаптивность */
@@ -1197,6 +1363,16 @@ export default {
 }
 
 @media (max-width: 768px) {
+    .container {
+        padding: 0 1rem;
+    }
+
+    .hero-title {
+        font-size: 2rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
     .section-header {
         flex-direction: column;
         align-items: stretch;
@@ -1206,8 +1382,8 @@ export default {
         flex-direction: column;
     }
 
-    .search-input {
-        min-width: auto;
+    .search-box {
+        max-width: none;
     }
 
     .table-header,
@@ -1265,5 +1441,49 @@ export default {
     .action-buttons {
         flex-direction: column;
     }
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.table-row {
+    animation: fadeIn 0.5s ease;
+}
+
+.stat-card {
+    animation: fadeIn 0.6s ease;
+}
+
+.role-card {
+    animation: fadeIn 0.7s ease;
+}
+
+/* Кастомный скроллбар */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
 }
 </style>

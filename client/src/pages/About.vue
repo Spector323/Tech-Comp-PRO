@@ -223,9 +223,11 @@ export default {
 
 /* Hero секция */
 .page-hero {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  background: linear-gradient(135deg, #333 0%, #666 100%);
   color: white;
-  padding: 6rem 0 4rem;
+  padding: 4rem 0 3rem;
+  position: relative;
+  overflow: hidden;
 }
 
 .hero-content {

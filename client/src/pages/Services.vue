@@ -58,7 +58,7 @@
           <h2 class="section-title">Дополнительные услуги</h2>
           <p class="section-subtitle">Специализированные услуги для вашей техники</p>
         </div>
-        
+
         <div class="additional-grid">
           <div v-for="service in additionalServices" :key="service.id" class="additional-card">
             <div class="additional-icon">{{ service.icon }}</div>
@@ -94,10 +94,10 @@ import { useAuthStore } from '@/stores/authStore'
 
 export default {
   name: 'ServicesPage',
-  
+
   setup() {
     const authStore = useAuthStore()
-    
+
     const isAuthenticated = computed(() => authStore.isAuthenticated)
 
     const mainServices = [
@@ -108,7 +108,7 @@ export default {
         description: 'Профессиональный ремонт ноутбуков всех производителей. От замены матрицы до ремонта материнской платы.',
         features: [
           'Бесплатная диагностика',
-          'Оригинальные запчасти', 
+          'Оригинальные запчасти',
           'Чип-левел ремонт',
           'Срочный ремонт за 1-2 дня'
         ],
@@ -123,7 +123,7 @@ export default {
         features: [
           'Замена дисплеев',
           'Ремонт после попадания воды',
-          'Замена аккумуляторов', 
+          'Замена аккумуляторов',
           'Восстановление данных'
         ],
         time: '1-2 дня',
@@ -207,9 +207,11 @@ export default {
 
 /* Hero секция */
 .page-hero {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  background: linear-gradient(135deg, #333 0%, #666 100%);
   color: white;
-  padding: 6rem 0 4rem;
+  padding: 4rem 0 3rem;
+  position: relative;
+  overflow: hidden;
 }
 
 .hero-content {
@@ -482,27 +484,27 @@ export default {
     padding: 2rem;
     text-align: center;
   }
-  
+
   .image-placeholder {
     width: 150px;
     height: 150px;
     font-size: 3rem;
     margin: 0 auto;
   }
-  
+
   .service-meta {
     justify-content: center;
   }
-  
+
   .cta-actions {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .hero-title {
     font-size: 2.5rem;
   }
-  
+
   .section-title {
     font-size: 2rem;
   }
