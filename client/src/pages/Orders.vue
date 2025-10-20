@@ -23,32 +23,25 @@
           <div class="stats-grid">
             <div class="stat-card">
               <div class="stat-info">
-                <i class="pi pi-file" style="font-size: 2.5rem"></i>
+                <i class="pi pi-file"></i>
                 <div class="stat-number">{{ stats.total }}</div>
               </div>
               <div class="stat-label">Всего заявок</div>
             </div>
             <div class="stat-card">
               <div class="stat-info">
-                <i class="pi pi-clock" style="font-size: 2.5rem"></i>
+                <i class="pi pi-clock"></i>
                 <div class="stat-number">{{ stats.active }}</div>
               </div>
               <div class="stat-label">Активные</div>
             </div>
             <div class="stat-card">
               <div class="stat-info">
-                <i class="pi pi-check-circle" style="font-size: 2.5rem"></i>
+                <i class="pi pi-check-circle"></i>
                 <div class="stat-number">{{ stats.completed }}</div>
               </div>
               <div class="stat-label">Завершённые</div>
             </div>
-          </div>
-
-          <div class="header-actions">
-            <button @click="showCreateModal = true" class="btn btn-primary">
-              <i class="pi pi-plus"></i>
-              Новая заявка
-            </button>
           </div>
         </div>
 
@@ -71,15 +64,15 @@
         <!-- Состояние загрузки -->
         <div v-if="loading" class="loading-state">
           <div class="spinner">
-            <i class="pi pi-spinner pi-spin" style="font-size: 2rem"></i>
+            <i class="pi pi-spinner pi-spin"></i>
           </div>
           <span>Загружаем ваши заявки...</span>
         </div>
 
         <!-- Состояние пустого списка -->
-        <div v-else-if="filteredOrders.length === 0" class="empty-state">
+        <div v-else-if="orders.length === 0" class="empty-state">
           <div class="empty-icon">
-            <i class="pi pi-inbox" style="font-size: 4rem"></i>
+            <i class="pi pi-inbox"></i>
           </div>
           <h3>Заявок пока нет</h3>
           <p>Создайте первую заявку на ремонт</p>
@@ -92,7 +85,7 @@
         <!-- Список заявок -->
         <div v-else class="orders-container">
           <div class="orders-grid">
-            <div v-for="order in filteredOrders" :key="order._id" class="order-card" :class="`status-${order.status}`">
+            <div v-for="order in orders" :key="order._id" class="order-card" :class="`status-${order.status}`">
               <div class="order-header">
                 <div class="order-main">
                   <h3 class="order-title">
@@ -127,10 +120,10 @@
               <div class="repair-progress" v-if="order.status === 'in_progress' || order.status === 'accepted'">
                 <div class="progress-header">
                   <span class="progress-label">Прогресс ремонта:</span>
-                  <span class="progress-percent">{{ Math.round((order.progress / 5) * 100) }}%</span>
+                  <span class="progress-percent">{{ calculateProgress(order) }}%</span>
                 </div>
                 <div class="progress-bar">
-                  <div class="progress-fill" :style="{ width: `${(order.progress / 5) * 100}%` }"></div>
+                  <div class="progress-fill" :style="{ width: `${calculateProgress(order)}%` }"></div>
                 </div>
                 <div class="progress-steps">
                   <div v-for="step in progressSteps" :key="step.number" class="progress-step" :class="{
@@ -153,21 +146,12 @@
                     </span>
                     <span class="detail-value">{{ order.deviceType }} {{ order.deviceModel }}</span>
                   </div>
-                  <div class="detail-item">
-                    <span class="detail-label">
-                      <i class="pi pi-info-circle"></i>
-                      Статус:
-                    </span>
-                    <span class="detail-value">{{ statusLabels[order.status] }}</span>
-                  </div>
-                </div>
-                <div class="detail-row" v-if="order.assignedMaster">
-                  <div class="detail-item">
+                  <div class="detail-item" v-if="order.assignedMaster">
                     <span class="detail-label">
                       <i class="pi pi-user"></i>
                       Мастер:
                     </span>
-                    <span class="detail-value">Мастер #{{ order.assignedMaster.slice(-6) }}</span>
+                    <span class="detail-value">Мастер {{ firstName }}</span>
                   </div>
                 </div>
               </div>
@@ -178,42 +162,46 @@
                   <i class="pi pi-eye"></i>
                   Подробнее
                 </button>
+
                 <button v-if="order.status === 'completed'" @click="downloadReport(order)" class="btn btn-outline">
                   <i class="pi pi-download"></i>
                   Скачать отчёт
                 </button>
-                <button v-if="order.status === 'pending'" @click="cancelOrder(order)" class="btn btn-danger">
-                  <i class="pi pi-times"></i>
-                  Отменить
-                </button>
-                <button v-if="order.status === 'pending'" @click="editOrder(order)" class="btn btn-outline">
-                  <i class="pi pi-pencil"></i>
-                  Редактировать
-                </button>
-                <button v-if="order.status === 'pending'" @click="deleteOrder(order)" class="btn btn-danger">
-                  <i class="pi pi-trash"></i>
-                  Удалить
-                </button>
+
+                <template v-if="order.status === 'pending'">
+                  <button @click="editOrder(order)" class="btn btn-outline">
+                    <i class="pi pi-pencil"></i>
+                    Редактировать
+                  </button>
+                  <button @click="cancelOrder(order)" class="btn btn-warning">
+                    <i class="pi pi-times"></i>
+                    Отменить
+                  </button>
+                  <button @click="deleteOrder(order)" class="btn btn-danger">
+                    <i class="pi pi-trash"></i>
+                    Удалить
+                  </button>
+                </template>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Пагинация -->
-        <div v-if="filteredOrders.length > 0" class="pagination">
-          <button @click="prevPage" :disabled="currentPage === 1" class="pagination-btn">
-            <i class="pi pi-chevron-left"></i>
-            Назад
-          </button>
+          <!-- Пагинация -->
+          <div v-if="totalPages > 1" class="pagination">
+            <button @click="prevPage" :disabled="currentPage === 1" class="pagination-btn">
+              <i class="pi pi-chevron-left"></i>
+              Назад
+            </button>
 
-          <span class="pagination-info">
-            Страница {{ currentPage }} из {{ totalPages }}
-          </span>
+            <span class="pagination-info">
+              Страница {{ currentPage }} из {{ totalPages }}
+            </span>
 
-          <button @click="nextPage" :disabled="currentPage === totalPages" class="pagination-btn">
-            Вперед
-            <i class="pi pi-chevron-right"></i>
-          </button>
+            <button @click="nextPage" :disabled="currentPage === totalPages" class="pagination-btn">
+              Вперед
+              <i class="pi pi-chevron-right"></i>
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -254,8 +242,8 @@
                 <i class="pi pi-tag"></i>
                 Модель устройства *
               </label>
-              <input v-model="form.deviceModel" type="text" required placeholder="Например: MacBook Pro 16, iPhone 15 Pro"
-                class="form-input">
+              <input v-model="form.deviceModel" type="text" required
+                placeholder="Например: MacBook Pro 16, iPhone 15 Pro" class="form-input">
             </div>
 
             <div class="form-group">
@@ -306,12 +294,14 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { orderService } from '@/services/orderService'
+import { useToast } from 'vue-toastification'
 
 export default {
   name: 'OrdersPage',
 
   setup() {
     const authStore = useAuthStore()
+    const toast = useToast()
 
     const orders = ref([])
     const loading = ref(true)
@@ -375,13 +365,11 @@ export default {
     const loadOrders = async () => {
       try {
         loading.value = true
-        console.log('Загружаем заявки с сервера...')
         const response = await orderService.getMyOrders()
         orders.value = response
-        console.log('Заявки загружены:', orders.value.length)
       } catch (error) {
         console.error('Ошибка загрузки заявок:', error)
-        alert('Ошибка загрузки заявок: ' + error.message)
+        toast.error('Ошибка загрузки заявок')
       } finally {
         loading.value = false
       }
@@ -393,20 +381,18 @@ export default {
         creatingOrder.value = true
 
         if (editingOrder.value) {
-          // Редактирование заявки
           await orderService.updateOrder(editingOrder.value._id, form.value)
-          alert('Заявка успешно обновлена!')
+          toast.success('Заявка успешно обновлена!')
         } else {
-          // Создание новой заявки
           await orderService.createOrder(form.value)
-          alert('Заявка успешно создана!')
+          toast.success('Заявка успешно создана!')
         }
 
-        await loadOrders() // Перезагружаем список
+        await loadOrders()
         closeModal()
       } catch (error) {
         console.error('Ошибка сохранения заявки:', error)
-        alert('Ошибка: ' + error.message)
+        toast.error('Ошибка сохранения заявки')
       } finally {
         creatingOrder.value = false
       }
@@ -418,10 +404,10 @@ export default {
         try {
           await orderService.deleteOrder(order._id)
           await loadOrders()
-          alert('Заявка удалена')
+          toast.success('Заявка удалена')
         } catch (error) {
           console.error('Ошибка удаления заявки:', error)
-          alert('Ошибка удаления: ' + error.message)
+          toast.error('Ошибка удаления заявки')
         }
       }
     }
@@ -444,10 +430,10 @@ export default {
         try {
           await orderService.updateOrder(order._id, { status: 'cancelled' })
           await loadOrders()
-          alert('Заявка отменена')
+          toast.info('Заявка отменена')
         } catch (error) {
           console.error('Ошибка отмены заявки:', error)
-          alert('Ошибка отмены: ' + error.message)
+          toast.error('Ошибка отмены заявки')
         }
       }
     }
@@ -465,16 +451,27 @@ export default {
       }
     }
 
+    // Вспомогательные функции
+    const calculateProgress = (order) => {
+      return order.progress ? Math.round((order.progress / 5) * 100) : 0
+    }
+
+    const formatDate = (dateString) => {
+      return new Date(dateString).toLocaleDateString('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      })
+    }
+
     // Компьютед свойства
     const filteredOrders = computed(() => {
       let filtered = orders.value
 
-      // Фильтрация по статусу
       if (currentFilter.value !== 'all') {
         filtered = filtered.filter(order => order.status === currentFilter.value)
       }
 
-      // Поиск
       if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase()
         filtered = filtered.filter(order =>
@@ -500,11 +497,9 @@ export default {
     const stats = computed(() => {
       const total = orders.value.length
       const active = orders.value.filter(order =>
-        order.status === 'pending' || order.status === 'accepted' || order.status === 'in_progress'
+        ['pending', 'accepted', 'in_progress'].includes(order.status)
       ).length
-      const completed = orders.value.filter(order =>
-        order.status === 'completed'
-      ).length
+      const completed = orders.value.filter(order => order.status === 'completed').length
 
       return { total, active, completed }
     })
@@ -535,34 +530,21 @@ ${order.description}
     }
 
     const downloadReport = (order) => {
-      alert(`Отчёт по заявке #${order._id.slice(-6)} скачивается...`)
-    }
-
-    const formatDate = (dateString) => {
-      return new Date(dateString).toLocaleDateString('ru-RU', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      })
+      toast.info(`Отчёт по заявке #${order._id.slice(-6)} скачивается...`)
     }
 
     const prevPage = () => {
-      if (currentPage.value > 1) {
-        currentPage.value--
-      }
+      if (currentPage.value > 1) currentPage.value--
     }
 
     const nextPage = () => {
-      if (currentPage.value < totalPages.value) {
-        currentPage.value++
-      }
+      if (currentPage.value < totalPages.value) currentPage.value++
     }
 
     // Загрузка данных при монтировании
     onMounted(() => {
-      console.log('Orders mounted, auth:', authStore.isAuthenticated)
       if (!authStore.isAuthenticated) {
-        alert('Вы не авторизованы')
+        toast.warning('Вы не авторизованы')
         return
       }
       loadOrders()
@@ -574,7 +556,6 @@ ${order.description}
       creatingOrder,
       showCreateModal,
       showEditModal,
-      editingOrder,
       currentFilter,
       searchQuery,
       currentPage,
@@ -584,7 +565,6 @@ ${order.description}
       progressSteps,
       form,
       stats,
-      filteredOrders: paginatedOrders,
       setFilter,
       submitOrder,
       deleteOrder,
@@ -594,6 +574,7 @@ ${order.description}
       viewOrderDetails,
       downloadReport,
       formatDate,
+      calculateProgress,
       prevPage,
       nextPage,
       getStatusIcon
@@ -729,11 +710,6 @@ ${order.description}
   text-align: center;
 }
 
-.header-actions {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-}
 
 /* Фильтры и поиск */
 .filters-section {
