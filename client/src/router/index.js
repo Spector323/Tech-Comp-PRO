@@ -2,16 +2,15 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 
 // Импортируем компоненты страниц
-import Home from '@/pages/Home.vue'
-import Auth from '@/pages/Auth.vue'
-import Profile from '@/pages/Profile.vue'
-import Orders from '@/pages/Orders.vue'
-import Services from '@/pages/Services.vue'
-import About from '@/pages/About.vue'
+import Auth from '@/components/Auth.vue'
+import Home from '@/pages/client/Home.vue'
+import Profile from '@/pages/client/Profile.vue'
+import Orders from '@/pages/client/Orders.vue'
+import Services from '@/pages/client/Services.vue'
+import About from '@/pages/client/About.vue'
 import ManagerPanel from '@/pages/ManagerPanel.vue'
 import MasterPanel from '@/pages/MasterPanel.vue'
 import AdminPanel from '@/pages/AdminPanel.vue'
-// import AdminPanel from '@/pages/AdminPanel.vue'
 
 const routes = [
   {
@@ -50,7 +49,7 @@ const routes = [
     path: '/master',
     name: 'MasterPanel',
     component: MasterPanel,
-    meta: { requiresAuth: true, requiresMaster: true } // Было requiresManager: true
+    meta: { requiresAuth: true, requiresMaster: true } 
   },
   {
     path: '/orders',

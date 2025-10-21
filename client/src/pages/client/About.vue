@@ -19,17 +19,17 @@
           <div class="company-content">
             <h2>Наша история</h2>
             <p>
-              TECH SERVICE PRO был основан в 2009 году с целью предоставления 
-              качественных сервисных услуг в сфере ремонта электроники. 
-              За 15 лет работы мы выросли из небольшой мастерской в 
+              TECH SERVICE PRO был основан в 2009 году с целью предоставления
+              качественных сервисных услуг в сфере ремонта электроники.
+              За 15 лет работы мы выросли из небольшой мастерской в
               современный сервисный центр с командой профессионалов.
             </p>
             <p>
-              Сегодня мы объединяем лучших специалистов, современное 
-              оборудование и многолетний опыт для решения самых сложных 
+              Сегодня мы объединяем лучших специалистов, современное
+              оборудование и многолетний опыт для решения самых сложных
               задач по ремонту техники.
             </p>
-            
+
             <div class="stats-row">
               <div class="stat">
                 <div class="stat-number">15+</div>
@@ -45,9 +45,11 @@
               </div>
             </div>
           </div>
-          
+
           <div class="company-image">
-            <div class="image-placeholder">🏢</div>
+            <div class="image-placeholder">
+              <i class="pi pi-building" style="font-size: 8rem; color: #222;"></i>
+            </div>
           </div>
         </div>
       </div>
@@ -58,12 +60,14 @@
       <div class="container">
         <div class="section-header">
           <h2 class="section-title">Наши ценности</h2>
-          <p class="section-subtitle">Принципы, которые guide нашу работу</p>
+          <p class="section-subtitle">Принципы, которые направляют нашу работу</p>
         </div>
-        
+
         <div class="values-grid">
           <div v-for="value in values" :key="value.id" class="value-card">
-            <div class="value-icon">{{ value.icon }}</div>
+            <div class="value-icon">
+              <i :class="value.icon"></i>
+            </div>
             <h3 class="value-title">{{ value.title }}</h3>
             <p class="value-description">{{ value.description }}</p>
           </div>
@@ -78,11 +82,13 @@
           <h2 class="section-title">Наша команда</h2>
           <p class="section-subtitle">Профессионалы с многолетним опытом</p>
         </div>
-        
+
         <div class="team-grid">
           <div v-for="member in team" :key="member.id" class="team-card">
             <div class="member-photo">
-              <div class="photo-placeholder">{{ member.placeholder }}</div>
+              <div class="photo-placeholder">
+                <i :class="member.icon"></i>
+              </div>
             </div>
             <h3 class="member-name">{{ member.name }}</h3>
             <p class="member-role">{{ member.role }}</p>
@@ -99,10 +105,12 @@
         <div class="section-header">
           <h2 class="section-title">Сертификаты и лицензии</h2>
         </div>
-        
+
         <div class="certificates-grid">
           <div v-for="cert in certificates" :key="cert.id" class="certificate-card">
-            <div class="cert-icon">{{ cert.icon }}</div>
+            <div class="cert-icon">
+              <i :class="cert.icon"></i>
+            </div>
             <h3 class="cert-title">{{ cert.title }}</h3>
             <p class="cert-description">{{ cert.description }}</p>
           </div>
@@ -113,41 +121,43 @@
 </template>
 
 <script>
+import { ref } from 'vue'
+
 export default {
   name: 'AboutPage',
-  
+
   setup() {
-    const values = [
+    const values = ref([
       {
         id: 1,
-        icon: '🎯',
+        icon: 'pi pi-verified',
         title: 'Качество',
         description: 'Используем только оригинальные запчасти и современное оборудование'
       },
       {
         id: 2,
-        icon: '⚡',
+        icon: 'pi pi-bolt',
         title: 'Скорость',
         description: 'Большинство ремонтов выполняем в течение 1-2 рабочих дней'
       },
       {
         id: 3,
-        icon: '🛡️',
+        icon: 'pi pi-shield',
         title: 'Надежность',
         description: 'Предоставляем гарантию до 2 лет на все виды работ'
       },
       {
         id: 4,
-        icon: '💎',
+        icon: 'pi pi-graduation-cap',
         title: 'Профессионализм',
         description: 'Работают только сертифицированные специалисты с опытом от 5 лет'
       }
-    ]
+    ])
 
-    const team = [
+    const team = ref([
       {
         id: 1,
-        placeholder: '👨‍💼',
+        icon: 'pi pi-user',
         name: 'Александр Петров',
         role: 'Технический директор',
         experience: 'Опыт: 12 лет',
@@ -155,7 +165,7 @@ export default {
       },
       {
         id: 2,
-        placeholder: '👩‍🔧',
+        icon: 'pi pi-user',
         name: 'Мария Иванова',
         role: 'Старший мастер',
         experience: 'Опыт: 8 лет',
@@ -163,7 +173,7 @@ export default {
       },
       {
         id: 3,
-        placeholder: '👨‍🔧',
+        icon: 'pi pi-user',
         name: 'Дмитрий Сидоров',
         role: 'Инженер-электронщик',
         experience: 'Опыт: 10 лет',
@@ -171,40 +181,40 @@ export default {
       },
       {
         id: 4,
-        placeholder: '👩‍💻',
+        icon: 'pi pi-user',
         name: 'Елена Козлова',
         role: 'Специалист по данным',
         experience: 'Опыт: 6 лет',
         specialization: 'Специализация: восстановление данных'
       }
-    ]
+    ])
 
-    const certificates = [
+    const certificates = ref([
       {
         id: 1,
-        icon: '📜',
+        icon: 'pi pi-apple',
         title: 'Сертификат Apple',
         description: 'Официальный сертификат авторизованного сервисного центра Apple'
       },
       {
         id: 2,
-        icon: '🏆',
+        icon: 'pi pi-mobile',
         title: 'Сертификат Samsung',
         description: 'Сертифицированный партнер Samsung по ремонту мобильных устройств'
       },
       {
         id: 3,
-        icon: '⭐',
+        icon: 'pi pi-star-fill',
         title: 'ISO 9001',
         description: 'Международный стандарт качества управления'
       },
       {
         id: 4,
-        icon: '🔧',
+        icon: 'pi pi-id-card',
         title: 'Лицензия СРО',
         description: 'Лицензия на осуществление сервисной деятельности'
       }
-    ]
+    ])
 
     return {
       values,
@@ -499,22 +509,22 @@ export default {
     gap: 2rem;
     text-align: center;
   }
-  
+
   .stats-row {
     flex-direction: column;
     gap: 2rem;
   }
-  
+
   .image-placeholder {
     width: 200px;
     height: 200px;
     font-size: 4rem;
   }
-  
+
   .hero-title {
     font-size: 2.5rem;
   }
-  
+
   .section-title {
     font-size: 2rem;
   }

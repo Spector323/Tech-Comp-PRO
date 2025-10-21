@@ -667,7 +667,6 @@ ${order.price ? `Цена: ${order.price} ₽` : 'Цена еще не уста�
 </script>
 
 <style scoped>
-/* Общие стили панели */
 .panel-page {
     background: #f8f9fa;
     min-height: 100vh;

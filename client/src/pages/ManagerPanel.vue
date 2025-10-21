@@ -584,7 +584,6 @@ export default {
 </script>
 
 <style scoped>
-/* Общие стили панели */
 .panel-page {
   background: #f8f9fa;
   min-height: 100vh;

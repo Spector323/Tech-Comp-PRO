@@ -67,7 +67,7 @@
 import { ref } from 'vue';
 
 export default {
-  name: 'AuthForm',
+  name: 'Form',
   emits: ['submit'],
   setup(props, { emit }) {
     const isLogin = ref(true);
