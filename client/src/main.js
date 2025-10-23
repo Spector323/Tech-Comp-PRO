@@ -12,13 +12,11 @@ import 'vue-toastification/dist/index.css'
 app.use(pinia)
 app.use(router)
 
-// Инициализируем authStore после создания приложения
 import { useAuthStore } from '@/stores/authStore'
 const authStore = useAuthStore()
 authStore.initializeAuth()
 
 app.use(Toast, {
-    // Можно настроить опции (необязательно)
     position: 'top-right',
     timeout: 5000,
     closeOnClick: true,
