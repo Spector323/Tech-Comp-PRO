@@ -1,13 +1,22 @@
-<template>  
+<template>
   <div class="profile-container">
     <!-- Левая колонка: профиль -->
     <div class="profile-card">
       <div class="avatar-section">
-        <img :src="user.avatar || '/avatar.png'" :alt="`${user.firstName} ${user.lastName}`" class="avatar"
-          @error="handleImageError" />
+        <img
+          :src="user.avatar || '/avatar.png'"
+          :alt="`${user.firstName} ${user.lastName}`"
+          class="avatar"
+          @error="handleImageError"
+        />
         <button @click="triggerAvatarUpload" class="btn-avatar-edit">✏️</button>
-
-        <input type="file" ref="avatarInput" @change="handleAvatarUpload" accept="image/*" style="display: none" />
+        <input
+          type="file"
+          ref="avatarInput"
+          @change="handleAvatarUpload"
+          accept="image/*"
+          style="display: none"
+        />
       </div>
       <div class="profile-info">
         <h2>{{ user.firstName }} {{ user.lastName }}</h2>
@@ -31,8 +40,13 @@
           <span class="badge">{{ filteredOrders.length }} шт.</span>
         </div>
         <div class="orders-filter">
-          <button v-for="filter in statusFilters" :key="filter.key" @click="setStatusFilter(filter.key)"
-            :class="{ active: currentStatusFilter === filter.key }" class="filter-btn">
+          <button
+            v-for="filter in statusFilters"
+            :key="filter.key"
+            @click="setStatusFilter(filter.key)"
+            :class="{ active: currentStatusFilter === filter.key }"
+            class="filter-btn"
+          >
             {{ filter.label }}
           </button>
         </div>
@@ -47,8 +61,13 @@
           У вас пока нет заявок в этом статусе.
         </div>
         <div v-else class="orders-list">
-          <div v-for="order in filteredOrders" :key="order.id" class="order-item"
-            :class="{ 'active-order': currentOrder && currentOrder.id === order.id }" @click="setCurrentOrder(order)">
+          <div
+            v-for="order in filteredOrders"
+            :key="order._id"
+            class="order-item"
+            :class="{ 'active-order': currentOrder && currentOrder._id === order._id }"
+            @click="setCurrentOrder(order)"
+          >
             <div class="order-info">
               <span class="order-title">{{ order.service }}</span>
               <span class="order-date">{{ formatDate(order.createdAt) }}</span>
@@ -62,26 +81,35 @@
       </div>
 
       <!-- Блок: Текущий ремонт -->
-      <div class="card" v-if="currentOrder && !loading.currentOrder">
+      <div class="card" v-if="currentOrder && !loading.orders">
         <div class="card-header">
           <h3>Текущий ремонт</h3>
           <div>
             <button @click="viewDetails(currentOrder)" class="btn-small">Подробнее</button>
-            <button @click="downloadReport(currentOrder)" class="btn-small" v-if="currentOrder.status === 'completed'">
+            <button
+              @click="downloadReport(currentOrder)"
+              class="btn-small"
+              v-if="currentOrder.status === 'completed'"
+            >
               📄 Отчёт
             </button>
           </div>
         </div>
         <div class="current-order-info">
           <h4>{{ currentOrder.service }}</h4>
-          <p>Заявка #{{ currentOrder.id }} • {{ formatDate(currentOrder.createdAt) }}</p>
+          <p>Заявка #{{ currentOrder._id }} • {{ formatDate(currentOrder.createdAt) }}</p>
           <p v-if="currentOrder.description" class="order-description">{{ currentOrder.description }}</p>
         </div>
         <div class="repair-progress">
-          <div v-for="step in progressSteps" :key="step.number" class="progress-step" :class="{
-            active: currentOrder.progress >= step.number,
-            completed: currentOrder.progress >= step.number
-          }">
+          <div
+            v-for="step in progressSteps"
+            :key="step.number"
+            class="progress-step"
+            :class="{
+              active: currentOrder.progress >= step.number,
+              completed: currentOrder.progress >= step.number,
+            }"
+          >
             <div class="step-number">{{ step.number }}</div>
             <div class="step-label">{{ step.label }}</div>
           </div>
@@ -103,16 +131,13 @@
           <div class="setting-item">
             <span>Email уведомления</span>
             <label class="switch">
-              <input type="checkbox" v-model="notificationsEnabled" @change="saveSettings" />
+              <input
+                type="checkbox"
+                v-model="notificationsEnabled"
+                @change="saveSettings"
+              />
               <span class="slider"></span>
             </label>
-          </div>
-          <div class="setting-item">
-            <span>Тема</span>
-            <select v-model="theme" class="theme-select" @change="saveSettings">
-              <option value="light">Светлая</option>
-              <option value="dark">Тёмная</option>
-            </select>
           </div>
         </div>
       </div>
@@ -128,24 +153,48 @@
         <div class="modal-body">
           <div class="form-group">
             <label>Имя</label>
-            <input type="text" v-model="editForm.firstName" class="form-input" placeholder="Введите имя" />
+            <input
+              type="text"
+              v-model="editForm.firstName"
+              class="form-input"
+              placeholder="Введите имя"
+            />
           </div>
           <div class="form-group">
             <label>Фамилия</label>
-            <input type="text" v-model="editForm.lastName" class="form-input" placeholder="Введите фамилию" />
+            <input
+              type="text"
+              v-model="editForm.lastName"
+              class="form-input"
+              placeholder="Введите фамилию"
+            />
           </div>
           <div class="form-group">
             <label>Email</label>
-            <input type="email" v-model="editForm.email" class="form-input" placeholder="Введите email" />
+            <input
+              type="email"
+              v-model="editForm.email"
+              class="form-input"
+              placeholder="Введите email"
+            />
           </div>
           <div class="form-group">
             <label>Телефон</label>
-            <input type="tel" v-model="editForm.phone" class="form-input" placeholder="+7 (XXX) XXX-XX-XX" />
+            <input
+              type="tel"
+              v-model="editForm.phone"
+              class="form-input"
+              placeholder="+7 (XXX) XXX-XX-XX"
+            />
           </div>
         </div>
         <div class="modal-footer">
           <button @click="closeEditModal" class="btn-cancel">Отмена</button>
-          <button @click="saveProfile" class="btn-save" :disabled="loading.profile">
+          <button
+            @click="saveProfile"
+            class="btn-save"
+            :disabled="loading.profile"
+          >
             {{ loading.profile ? 'Сохранение...' : 'Сохранить' }}
           </button>
         </div>
@@ -155,320 +204,241 @@
 </template>
 
 <script>
-import { ref, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/authStore'
-import { useToast } from 'vue-toastification'
+import { ref, onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/authStore';
+import { useToast } from 'vue-toastification';
+import { orderService } from '@/services/orderService';
+
 export default {
   name: 'ProfilePage',
-
   setup() {
-    const authStore = useAuthStore()
-    const router = useRouter()
-    const toast = useToast()
+    const authStore = useAuthStore();
+    const router = useRouter();
+    const toast = useToast();
 
-    const user = ref({
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      avatar: ''
-    })
-    const showEditModal = ref(false)
+    const user = ref({ ...authStore.user });
+    const showEditModal = ref(false);
     const loading = ref({
       profile: false,
       orders: false,
-      currentOrder: false
-    })
-    const message = ref('')
-    const error = ref('')
+    });
 
-    const editForm = ref({
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: ''
-    })
+    const editForm = ref({ ...authStore.user });
 
-    // Данные для заявок
-    const orders = ref([])
-    const currentOrder = ref(null)
-    const currentStatusFilter = ref('all')
+    // Заявки
+    const orders = ref([]);
+    const currentOrder = ref(null);
+    const currentStatusFilter = ref('all');
 
     const statusFilters = [
       { key: 'all', label: 'Все' },
-      { key: 'in_progress', label: 'В работе' },
       { key: 'pending', label: 'Ожидание' },
-      { key: 'completed', label: 'Завершённые' }
-    ]
+      { key: 'manager_review', label: 'На рассмотрении' },
+      { key: 'accepted', label: 'Принята' },
+      { key: 'in_progress', label: 'В работе' },
+      { key: 'completed', label: 'Завершённые' },
+      { key: 'cancelled', label: 'Отменено' },
+      { key: 'rejected', label: 'Отклонено' },
+    ];
 
     const progressSteps = [
       { number: 1, label: 'Приём' },
       { number: 2, label: 'Диагностика' },
       { number: 3, label: 'Ремонт' },
       { number: 4, label: 'Тест' },
-      { number: 5, label: 'Выдача' }
-    ]
+      { number: 5, label: 'Выдача' },
+    ];
 
     const statusLabels = {
-      pending: 'Ожидает',
+      pending: 'Ожидание',
+      manager_review: 'На рассмотрении',
+      accepted: 'Принята',
       in_progress: 'В работе',
-      completed: 'Готово',
-      cancelled: 'Отменено'
-    }
+      completed: 'Завершена',
+      cancelled: 'Отменена',
+      rejected: 'Отклонена',
+    };
 
     // Настройки
-    const notificationsEnabled = ref(true)
-    const theme = ref('dark')
+    const notificationsEnabled = ref(true);
+    const theme = ref('dark');
 
-    // Компьютед свойства
+    // Вычисляемые свойства
     const filteredOrders = computed(() => {
-      if (currentStatusFilter.value === 'all') {
-        return orders.value
-      }
-      return orders.value.filter(order => order.status === currentStatusFilter.value)
-    })
+      if (currentStatusFilter.value === 'all') return orders.value;
+      return orders.value.filter((order) => order.status === currentStatusFilter.value);
+    });
 
-    // Методы
+    // === Методы профиля ===
     const loadUserData = async () => {
       try {
-        loading.value.profile = true
-        error.value = ''
-
-        console.log('Загрузка профиля...')
-        const profileData = await authStore.getProfile()
-        console.log('Профиль загружен:', profileData)
-
-        user.value = {
-          ...profileData.user,
-          // ✅ Аватар загружается с сервера, если null - используем дефолтный
-          avatar: profileData.user.avatar
-        }
-        editForm.value = { ...profileData.user }
-
+        loading.value.profile = true;
+        const profileData = await authStore.getProfile();
+        user.value = { ...profileData.user };
+        editForm.value = { ...profileData.user };
       } catch (err) {
-        console.error('Ошибка загрузки профиля:', err)
-        error.value = err.message || 'Не удалось загрузить профиль'
+        console.error('Ошибка загрузки профиля:', err);
+        toast.error('Не удалось загрузить профиль');
       } finally {
-        loading.value.profile = false
+        loading.value.profile = false;
       }
-    }
-
-    const loadUserOrders = async () => {
-      try {
-        loading.value.orders = true
-        const response = await fetch('http://localhost:3000/api/orders', {
-          headers: {
-            'Authorization': `Bearer ${authStore.token}`
-          }
-        })
-        const result = await response.json()
-        if (result.success) {
-          orders.value = result.orders
-          currentOrder.value = orders.value.find(order => order.status === 'in_progress') || orders.value[0]
-        }
-      } catch (err) {
-        console.error('Ошибка загрузки заявок:', err)
-        toast.error('Не удалось загрузить заявки')
-      } finally {
-        loading.value.orders = false
-      }
-    }
-    const loadUserSettings = async () => {
-      try {
-        const savedSettings = localStorage.getItem('userSettings')
-        if (savedSettings) {
-          const settings = JSON.parse(savedSettings)
-          notificationsEnabled.value = settings.notificationsEnabled ?? true
-          theme.value = settings.theme || 'dark'
-        }
-      } catch (err) {
-        console.error('Ошибка загрузки настроек:', err)
-      }
-    }
+    };
 
     const openEditModal = () => {
-      editForm.value = { ...user.value }
-      showEditModal.value = true
-    }
+      editForm.value = { ...user.value };
+      showEditModal.value = true;
+    };
 
     const closeEditModal = () => {
-      showEditModal.value = false
-      error.value = ''
-      message.value = ''
-    }
+      showEditModal.value = false;
+    };
 
     const saveProfile = async () => {
       try {
-        loading.value.profile = true
-        error.value = ''
-        message.value = ''
-
-        console.log('Сохранение профиля:', editForm.value)
-        await authStore.updateProfile(editForm.value)
-
-        // Обновляем данные пользователя
-        await loadUserData()
-
-        toast.success('Профиль успешно обновлён')
-        setTimeout(() => {
-          showEditModal.value = false
-        }, 1000)
-
+        loading.value.profile = true;
+        await authStore.updateProfile(editForm.value);
+        await loadUserData();
+        toast.success('Профиль успешно обновлён');
+        setTimeout(() => showEditModal.value = false, 1000);
       } catch (err) {
-        console.error('Ошибка сохранения профиля:', err)
-        toast.error('Ошибка при сохранении профиля')
+        console.error('Ошибка сохранения профиля:', err);
+        toast.error('Ошибка при сохранении профиля');
       } finally {
-        loading.value.profile = false
+        loading.value.profile = false;
       }
-    }
+    };
 
     const triggerAvatarUpload = () => {
-      document.querySelector('input[type="file"]').click()
-    }
+      document.querySelector('input[type="file"]').click();
+    };
 
-    const loadOrders = async () => {
-      try {
-        loading.value = true
-        console.log('Загружаем заявки с сервера...')
-        const response = await orderService.getMyOrders()
-        orders.value = response
-        console.log('Заявки загружены:', orders.value.length)
-      } catch (error) {
-        console.error('Ошибка загрузки заявок:', error)
-        alert('Ошибка загрузки заявок: ' + error.message)
-      } finally {
-        loading.value = false
-      }
-    }
+    const handleImageError = (e) => {
+      e.target.src = '/avatar.png';
+    };
 
     const handleAvatarUpload = async (event) => {
-      const file = event.target.files[0]
-      if (!file) return
-
+      const file = event.target.files[0];
+      if (!file) return;
       if (!file.type.startsWith('image/')) {
-        alert('Пожалуйста, выберите изображение')
-        return
+        toast.error('Пожалуйста, выберите изображение');
+        return;
       }
-
       if (file.size > 5 * 1024 * 1024) {
-        alert('Файл слишком большой (макс. 5MB)')
-        return
+        toast.error('Файл слишком большой (макс. 5MB)');
+        return;
       }
 
       try {
-        loading.value.profile = true
+        loading.value.profile = true;
+        const formData = new FormData();
+        formData.append('avatar', file);
 
-        // ✅ Создаем FormData для отправки файла
-        const formData = new FormData()
-        formData.append('avatar', file)
-
-        // ✅ Отправляем на сервер
         const response = await fetch('http://localhost:3000/api/users/avatar', {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${authStore.token}`
-          },
-          body: formData
-        })
+          headers: { Authorization: `Bearer ${authStore.token}` },
+          body: formData,
+        });
 
-        const result = await response.json()
-
+        const result = await response.json();
         if (result.success) {
-          // ✅ Обновляем аватар в состоянии
-          user.value.avatar = result.user.avatar
-          // ✅ Обновляем в authStore
-          authStore.user.avatar = result.user.avatar
-          localStorage.setItem('user', JSON.stringify(authStore.user))
-
-          toast.success('Фотография успешно обновлена!')
-        } else {
-          toast.error('Ошибка при обновлении аватара: ' + result.message)
+          user.value.avatar = result.user.avatar;
+          authStore.user.avatar = result.user.avatar;
+          localStorage.setItem('user', JSON.stringify(authStore.user));
+          toast.success('Фотография успешно обновлена!');
         }
-
       } catch (err) {
-        console.error('Ошибка загрузки аватара:', err)
-        toast.error('Ошибка при загрузке фото')
+        console.error('Ошибка загрузки аватара:', err);
+        toast.error('Ошибка при загрузке фото');
       } finally {
-        loading.value.profile = false
-        // Очищаем input
-        event.target.value = ''
+        loading.value.profile = false;
+        event.target.value = '';
       }
-    }
+    };
+
+    // === Методы заявок ===
+    const loadUserOrders = async () => {
+      try {
+        loading.value.orders = true;
+        orders.value = await orderService.getOrdersByRole();
+        currentOrder.value =
+          orders.value.find((order) => order.status === 'in_progress') || orders.value[0] || null;
+      } catch (err) {
+        console.error('Ошибка загрузки заявок:', err);
+        toast.error('Не удалось загрузить заявки');
+      } finally {
+        loading.value.orders = false;
+      }
+    };
 
     const setStatusFilter = (filter) => {
-      currentStatusFilter.value = filter
-    }
+      currentStatusFilter.value = filter;
+    };
 
     const setCurrentOrder = (order) => {
-      currentOrder.value = order
-    }
+      currentOrder.value = order;
+    };
 
     const viewDetails = (order) => {
-      alert(`Детали заявки:\n\nУслуга: ${order.service}\nСтатус: ${statusLabels[order.status]}\nЦена: ${order.price ? order.price + '₽' : 'не указана'}\nПрогресс: ${order.progress}/5`)
-    }
+      alert(
+        `Детали заявки:\n\nУслуга: ${order.service}\nСтатус: ${
+          statusLabels[order.status]
+        }\nЦена: ${order.price ? order.price + '₽' : 'не указана'}\nПрогресс: ${
+          order.progress
+        }/5`
+      );
+    };
 
     const downloadReport = (order) => {
-      alert(`Отчёт по заявке #${order.id} скачивается...`)
-    }
+      alert(`Отчёт по заявке #${order._id} скачивается...`);
+    };
 
-    const saveSettings = () => {
-      const settings = {
-        notificationsEnabled: notificationsEnabled.value,
-        theme: theme.value
+    // === Настройки ===
+    const loadUserSettings = () => {
+      try {
+        const saved = localStorage.getItem('userSettings');
+        if (saved) {
+          const settings = JSON.parse(saved);
+          notificationsEnabled.value = settings.notificationsEnabled ?? true;
+          theme.value = settings.theme || 'dark';
+        }
+      } catch (err) {
+        console.error('Ошибка загрузки настроек:', err);
       }
-      localStorage.setItem('userSettings', JSON.stringify(settings))
-      toast.success('Настройки сохранены')
-    }
+    };
 
+    
+
+    // === Прочее ===
     const formatDate = (dateStr) => {
-      if (!dateStr) return ''
-      return new Date(dateStr).toLocaleDateString('ru-RU')
-    }
+      if (!dateStr) return '';
+      return new Date(dateStr).toLocaleDateString('ru-RU');
+    };
 
     const onLogout = () => {
       if (confirm('Вы уверены, что хотите выйти?')) {
-        authStore.logout()
-        router.push('/auth')
+        authStore.logout();
+        router.push('/auth');
       }
-    }
+    };
 
-    // Инициализация
-    const initData = async () => {
-      try {
-
-        await Promise.all([
-          loadUserData(),
-          loadUserOrders(),
-          loadUserSettings()
-        ])
-      } catch (err) {
-        console.error('Ошибка инициализации:', err)
-        error.value = 'Ошибка загрузки данных'
-      }
-    }
-
+    // === Инициализация ===
     onMounted(() => {
-      console.log('Profile mounted, auth status:', authStore.isAuthenticated)
       if (!authStore.isAuthenticated) {
-        error.value = 'Вы не авторизованы'
-        return
+        router.push('/auth');
+        return;
       }
-
-      loadUserData()
-      loadUserOrders()
-      loadUserSettings()
-    })
+      loadUserData();
+      loadUserOrders();
+      loadUserSettings();
+    });
 
     return {
       user,
       showEditModal,
       loading,
-      message,
-      error,
-      orders: filteredOrders,
-      filteredOrders,
       editForm,
+      filteredOrders,
       currentOrder,
       currentStatusFilter,
       statusFilters,
@@ -481,16 +451,16 @@ export default {
       saveProfile,
       triggerAvatarUpload,
       handleAvatarUpload,
+      handleImageError,
       setStatusFilter,
       setCurrentOrder,
       viewDetails,
       downloadReport,
-      saveSettings,
       formatDate,
-      onLogout
-    }
-  }
-}
+      onLogout,
+    };
+  },
+};
 </script>
 
 <style scoped>

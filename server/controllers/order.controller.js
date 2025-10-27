@@ -30,7 +30,54 @@ const getAllOrders = async (req, res) => {
     res.status(500).json({ message: 'Ошибка загрузки заявок' });
   }
 };
+const getOrdersByRole = async (req, res) => {
+  try {
+    let orders;
 
+    switch (req.user.role) {
+      case 'client':
+        orders = await Order.find({ user: req.user.id }).sort({ createdAt: -1 });
+        break;
+
+      case 'manager':
+        orders = await Order.find({
+          $or: [
+            { status: 'pending' },
+            { status: 'manager_review' },
+            { assignedManager: req.user.id }
+          ]
+        })
+          .populate('user', 'firstName lastName email phone')
+          .sort({ createdAt: -1 });
+        break;
+
+      case 'master':
+        orders = await Order.find({
+          $or: [
+            { status: 'accepted' },
+            { assignedMaster: req.user.id }
+          ]
+        })
+          .populate('user', 'firstName lastName email phone')
+          .sort({ createdAt: -1 });
+        break;
+
+      case 'admin':
+        orders = await Order.find()
+          .populate('user', 'firstName lastName email phone')
+          .sort({ createdAt: -1 });
+        break;
+
+      default:
+        return res.status(403).json({ message: 'Нет доступа к заявкам' });
+    }
+
+    res.json({ success: true, orders });
+  } catch (error) {
+    console.error('Ошибка загрузки заявок:', error);
+    res.status(500).json({ message: 'Ошибка загрузки заявок' });
+  }
+};
 const createOrder = async (req, res) => {
   try {
     const { service, description, deviceType, deviceModel } = req.body;
@@ -166,6 +213,7 @@ const setPrice = async (req, res) => {
 };
 
 module.exports = {
+  getOrdersByRole,
   getAllOrders,
   createOrder,
   updateOrder,

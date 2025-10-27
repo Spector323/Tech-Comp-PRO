@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
+const { getOrdersByRole } = require('../controllers/order.controller');
+
 const {
   getAllOrders,
   createOrder,
@@ -16,6 +18,7 @@ router.use(auth);
 
 router.get('/', getAllOrders);
 router.post('/', createOrder);
+router.get('/my-orders', getOrdersByRole);
 router.put('/:id', updateOrder);
 router.delete('/:id', deleteOrder);
 router.patch('/:id/accept', acceptOrder);

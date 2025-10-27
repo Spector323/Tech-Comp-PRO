@@ -11,7 +11,10 @@ export const orderService = {
     const response = await api.post('/orders', orderData);
     return response.data;
   },
-
+  async getOrdersByRole() {
+    const response = await api.get('/orders/my-orders');
+    return response.data.orders;
+  },
   // ✅ Обновить заявку
   async updateOrder(orderId, orderData) {
     const response = await api.put(`/orders/${orderId}`, orderData);
