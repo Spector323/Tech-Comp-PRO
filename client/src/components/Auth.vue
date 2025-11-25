@@ -3,7 +3,6 @@
     <div class="auth-container">
       <h2>{{ isLogin ? 'Вход в аккаунт' : 'Регистрация' }}</h2>
 
-      <!-- Сообщения об ошибках -->
       <div v-if="error" class="error-message">
         {{ error }}
       </div>
@@ -13,24 +12,14 @@
         <div v-if="!isLogin" class="form-row">
           <div class="form-group">
             <label>Имя *</label>
-            <input 
-              v-model="formData.firstName" 
-              type="text" 
-              required
-              placeholder="Введите ваше имя"
-              :class="{ 'input-error': errors.firstName }"
-            >
+            <input v-model="formData.firstName" type="text" required placeholder="Введите ваше имя"
+              :class="{ 'input-error': errors.firstName }">
             <span v-if="errors.firstName" class="field-error">{{ errors.firstName }}</span>
           </div>
           <div class="form-group">
             <label>Фамилия *</label>
-            <input 
-              v-model="formData.lastName" 
-              type="text" 
-              required
-              placeholder="Введите вашу фамилию"
-              :class="{ 'input-error': errors.lastName }"
-            >
+            <input v-model="formData.lastName" type="text" required placeholder="Введите вашу фамилию"
+              :class="{ 'input-error': errors.lastName }">
             <span v-if="errors.lastName" class="field-error">{{ errors.lastName }}</span>
           </div>
         </div>
@@ -38,26 +27,15 @@
         <!-- Общие поля -->
         <div class="form-group">
           <label>Email *</label>
-          <input 
-            v-model="formData.email" 
-            type="email" 
-            required
-            placeholder="example@mail.ru"
-            :class="{ 'input-error': errors.email }"
-          >
+          <input v-model="formData.email" type="email" required placeholder="example@mail.ru"
+            :class="{ 'input-error': errors.email }">
           <span v-if="errors.email" class="field-error">{{ errors.email }}</span>
         </div>
 
         <div class="form-group">
           <label>Пароль *</label>
-          <input 
-            v-model="formData.password" 
-            type="password" 
-            required
-            placeholder="Не менее 6 символов"
-            minlength="6"
-            :class="{ 'input-error': errors.password }"
-          >
+          <input v-model="formData.password" type="password" required placeholder="Не менее 6 символов" minlength="6"
+            :class="{ 'input-error': errors.password }">
           <span v-if="errors.password" class="field-error">{{ errors.password }}</span>
         </div>
 
@@ -66,7 +44,6 @@
         </button>
       </form>
 
-      <!-- Переключение между входом и регистрацией -->
       <p class="toggle-text">
         {{ isLogin ? 'Нет аккаунта?' : 'Уже есть аккаунт?' }}
         <button @click="toggleMode" class="toggle-btn">
@@ -193,7 +170,15 @@ export default {
           // Регистрация
           await authStore.register(formData.value)
         }
-        router.push('/')
+
+        // ✅ ПРАВИЛЬНОЕ МЕСТО ДЛЯ РЕДИРЕКТА:
+        if (!authStore.user?.emailVerified) {
+          router.push('/email-verification')
+          // Редирект на страницу подтверждения если email не подтвержден
+        } else {
+          router.push('/')
+        }
+
       } catch (err) {
         error.value = err.message
       } finally {
@@ -213,7 +198,6 @@ export default {
   }
 }
 </script>
-
 <style scoped>
 /* Стили остаются без изменений */
 .auth-page {
@@ -229,7 +213,7 @@ export default {
   background: white;
   padding: 3rem;
   border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 480px;
   border: 1px solid #f0f0f0;
@@ -322,7 +306,7 @@ export default {
 .submit-btn:hover {
   background: #333;
   transform: translateY(-1px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .submit-btn:disabled {
@@ -357,7 +341,7 @@ export default {
     padding: 2rem;
     margin: 1rem;
   }
-  
+
   .form-row {
     flex-direction: column;
     gap: 0;

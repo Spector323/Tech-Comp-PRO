@@ -59,11 +59,12 @@
                     </h2>
                     <div class="section-actions">
                         <button @click="showUserModal = true" class="btn btn-primary">
-                            <i class="pi pi-plus"></i> 
+                            <i class="pi pi-plus"></i>
                             Добавить пользователя
                         </button>
                         <div class="search-box">
-                            <input v-model="userSearch" type="text" placeholder="Поиск пользователей..." class="search-input" />
+                            <input v-model="userSearch" type="text" placeholder="Поиск пользователей..."
+                                class="search-input" />
                             <i class="pi pi-search search-icon"></i>
                         </div>
                     </div>
@@ -396,7 +397,7 @@ export default {
             try {
                 loadingUsers.value = true
                 const response = await adminService.getUsers()
-                users.value = response.users
+                users.value = response.users || response.data?.users || []
                 console.log('Пользователи загружены:', users.value.length)
             } catch (error) {
                 console.error('Ошибка загрузки пользователей:', error)
@@ -418,6 +419,10 @@ export default {
         const createUser = async () => {
             try {
                 const response = await adminService.createUser(newUser.value)
+                const newUserData = response.user || response.data?.user
+                if (newUserData) {
+                    users.value.unshift(newUserData)
+                }
                 users.value.unshift(response.user)
                 showUserModal.value = false
                 newUser.value = {

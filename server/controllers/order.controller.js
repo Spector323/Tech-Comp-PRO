@@ -80,6 +80,14 @@ const getOrdersByRole = async (req, res) => {
 };
 const createOrder = async (req, res) => {
   try {
+    if (!req.user.emailVerified) {
+      // Проверяем подтвержден ли email
+      return res.status(403).json({
+        success: false,
+        message: 'Для создания заявок необходимо подтвердить email'
+      })
+    } // ✅ ДОБАВИТЬ ЭТУ СКОБКУ!
+
     const { service, description, deviceType, deviceModel } = req.body;
     const order = await Order.create({
       user: req.user.id,
@@ -90,6 +98,7 @@ const createOrder = async (req, res) => {
       status: 'pending',
       statusHistory: [{ status: 'pending', changedBy: req.user.id }]
     });
+
     const populatedOrder = await Order.findById(order._id).populate('user', 'firstName lastName');
     res.status(201).json({ message: 'Заявка создана', order: populatedOrder });
   } catch (error) {
@@ -97,7 +106,6 @@ const createOrder = async (req, res) => {
     res.status(500).json({ message: 'Ошибка создания заявки' });
   }
 };
-
 const updateOrder = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);

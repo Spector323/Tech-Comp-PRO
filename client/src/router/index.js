@@ -49,7 +49,7 @@ const routes = [
     path: '/master',
     name: 'MasterPanel',
     component: MasterPanel,
-    meta: { requiresAuth: true, requiresMaster: true } 
+    meta: { requiresAuth: true, requiresMaster: true }
   },
   {
     path: '/orders',
@@ -62,6 +62,12 @@ const routes = [
     name: 'AdminPanel',
     component: AdminPanel,
     meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/email-verification',
+    name: 'EmailVerification',
+    component: () => import('@/pages/client/EmailVerification.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 
@@ -73,7 +79,7 @@ const router = createRouter({
 // Защита маршрутов
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
-  
+
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next('/auth')
   } else if (to.meta.requiresManager && !authStore.isManager && !authStore.isAdmin) {

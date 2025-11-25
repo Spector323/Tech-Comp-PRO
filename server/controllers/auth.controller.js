@@ -1,5 +1,14 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+// crypto - для генерации случайных токенов
+const { sendVerificationEmail } = require('../utils/emailService');
+// sendVerificationEmail - функция отправки email
+
+const generateVerificationToken = () => {
+  return crypto.randomBytes(32).toString('hex');
+  // Генерируем случайный токен из 64 символов
+}
 
 const register = async (req, res) => {
   try {
@@ -39,10 +48,17 @@ const register = async (req, res) => {
       lastName,
       email,
       password,
-      phone: phone || ''
+      phone: phone || '',
+      emailVerificationToken: generateVerificationToken(),
+      // Генерируем токен подтверждения
+      emailVerificationExpires: Date.now() + 24 * 60 * 60 * 1000
+      // Токен действует 24 часа
     });
 
     const savedUser = await user.save();
+
+    // Отправляем письмо с подтверждением
+    await sendVerificationEmail(email, savedUser.emailVerificationToken);
 
     const token = jwt.sign(
       { userId: savedUser._id },
@@ -58,12 +74,14 @@ const register = async (req, res) => {
       phone: savedUser.phone,
       role: savedUser.role,
       avatar: savedUser.avatar,
+      emailVerified: savedUser.emailVerified,
+      // Добавляем статус подтверждения email
       createdAt: savedUser.createdAt
     };
 
     res.status(201).json({
       success: true,
-      message: 'Пользователь успешно зарегистрирован',
+      message: 'Пользователь успешно зарегистрирован. Проверьте email для подтверждения.',
       user: userResponse,
       token
     });
@@ -130,6 +148,8 @@ const login = async (req, res) => {
       phone: user.phone,
       role: user.role,
       avatar: user.avatar,
+      emailVerified: user.emailVerified,
+      // Добавляем статус подтверждения email
       createdAt: user.createdAt
     };
 
@@ -148,4 +168,85 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+const verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.params;
+    // Получаем токен из URL
+
+    const user = await User.findOne({
+      emailVerificationToken: token,
+      emailVerificationExpires: { $gt: Date.now() }
+      // Ищем пользователя с действующим токеном
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Неверный или просроченный токен подтверждения'
+      });
+    }
+
+    user.emailVerified = true;
+    // Подтверждаем email
+    user.emailVerificationToken = undefined;
+    user.emailVerificationExpires = undefined;
+    // Удаляем использованный токен
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Email успешно подтвержден!'
+    });
+  } catch (error) {
+    console.error('Ошибка подтверждения email:', error);
+    res.status(500).json({
+      success: false, 
+      message: 'Ошибка подтверждения email'
+    });
+  }
+};
+
+const resendVerification = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Пользователь с таким email не найден'
+      });
+    }
+
+    if (user.emailVerified) {
+      return res.status(400).json({
+        success: false, 
+        message: 'Email уже подтвержден'
+      });
+    }
+
+    user.emailVerificationToken = generateVerificationToken();
+    // Генерируем новый токен
+    user.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000;
+    // Устанавливаем новое время жизни
+
+    await user.save();
+
+    await sendVerificationEmail(email, user.emailVerificationToken);
+    // Отправляем письмо с новым токеном
+
+    res.json({
+      success: true,
+      message: 'Письмо с подтверждением отправлено повторно'
+    });
+  } catch (error) {
+    console.error('Ошибка повторной отправки:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Ошибка при отправке письма'
+    });
+  }
+};
+
+module.exports = { register, login, verifyEmail, resendVerification };

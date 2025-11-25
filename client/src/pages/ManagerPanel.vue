@@ -239,7 +239,8 @@
               <div class="client-details">
                 <div class="client-field">
                   <span class="field-label">Имя:</span>
-                  <span class="field-value">{{ selectedOrder.user?.firstName }} {{ selectedOrder.user?.lastName }}</span>
+                  <span class="field-value">{{ selectedOrder.user?.firstName }} {{ selectedOrder.user?.lastName
+                    }}</span>
                 </div>
                 <div class="client-field">
                   <span class="field-label">Email:</span>
@@ -301,7 +302,8 @@
           </div>
         </div>
 
-        <div class="modal-footer" v-if="selectedOrder.status === 'pending' || selectedOrder.status === 'manager_review'">
+        <div class="modal-footer"
+          v-if="selectedOrder.status === 'pending' || selectedOrder.status === 'manager_review'">
           <button @click="acceptOrder(selectedOrder)" class="btn btn-success">
             <i class="pi pi-check"></i>
             Принять заявку
@@ -455,9 +457,14 @@ export default {
       showAssignModal.value = true
     }
 
+    // ЗАМЕНИТЬ неработающий метод:
     const assignMaster = async (master) => {
       try {
-        await orderService.assignToMaster(selectedOrder.value._id, master._id)
+        // Временное решение - обновить заявку напрямую
+        await orderService.updateOrder(selectedOrder.value._id, {
+          assignedMaster: master._id,
+          status: 'accepted'
+        })
         await loadOrders()
         showAssignModal.value = false
         selectedOrder.value = null
@@ -905,23 +912,26 @@ export default {
   gap: 0.25rem;
 }
 
-.status-pending { 
-  background: #fff3cd; 
+.status-pending {
+  background: #fff3cd;
   color: #856404;
   --status-color: #ffc107;
 }
-.status-manager_review { 
-  background: #cce7ff; 
+
+.status-manager_review {
+  background: #cce7ff;
   color: #004085;
   --status-color: #007bff;
 }
-.status-accepted { 
-  background: #d4edda; 
+
+.status-accepted {
+  background: #d4edda;
   color: #155724;
   --status-color: #28a745;
 }
-.status-in_progress { 
-  background: #d1ecf1; 
+
+.status-in_progress {
+  background: #d1ecf1;
   color: #0c5460;
   --status-color: #17a2b8;
 }
@@ -1436,8 +1446,15 @@ export default {
 
 /* Анимации */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .order-card {

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
@@ -44,10 +45,20 @@ const userSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true
-  }
+  },
+  emailVerified: {
+    type: Boolean,
+    default: false
+  },
+  // emailVerified - статус подтверждения email
+  emailVerificationToken: String,
+  // emailVerificationToken - токен для подтверждения
+  emailVerificationExpires: Date
+  // emailVerificationExpires - время жизни токена
 }, {
   timestamps: true
 });
+
 // Хеширование пароля перед сохранением
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
@@ -55,6 +66,7 @@ userSchema.pre('save', async function(next) {
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
+
 // Метод проверки пароля
 userSchema.methods.checkPassword = async function(password) {
   return await bcrypt.compare(password, this.password);

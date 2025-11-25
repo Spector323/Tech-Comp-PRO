@@ -52,7 +52,11 @@ export const useAuthStore = defineStore('auth', {
       this.token = token
       localStorage.setItem('token', token)
       localStorage.setItem('user', JSON.stringify(user))
-      console.log('Данные сохранены:', { user: user?.email, token: token ? 'exists' : 'null' })
+      console.log('Данные сохранены:', { 
+        user: user?.email, 
+        emailVerified: user?.emailVerified, 
+        token: token ? 'exists' : 'null' 
+      })
     },
 
     logout() {
