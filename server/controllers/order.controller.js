@@ -80,13 +80,13 @@ const getOrdersByRole = async (req, res) => {
 };
 const createOrder = async (req, res) => {
   try {
-    if (!req.user.emailVerified) {
-      // Проверяем подтвержден ли email
-      return res.status(403).json({
-        success: false,
-        message: 'Для создания заявок необходимо подтвердить email'
-      })
-    } // ✅ ДОБАВИТЬ ЭТУ СКОБКУ!
+    // if (!req.user.emailVerified) {
+    //   // Проверяем подтвержден ли email
+    //   return res.status(403).json({
+    //     success: false,
+    //     message: 'Для создания заявок необходимо подтвердить email'
+    //   })
+    // }
 
     const { service, description, deviceType, deviceModel } = req.body;
     const order = await Order.create({

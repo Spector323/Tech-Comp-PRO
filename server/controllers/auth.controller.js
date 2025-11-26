@@ -51,14 +51,15 @@ const register = async (req, res) => {
       phone: phone || '',
       emailVerificationToken: generateVerificationToken(),
       // Генерируем токен подтверждения
-      emailVerificationExpires: Date.now() + 24 * 60 * 60 * 1000
+      emailVerificationExpires: Date.now() + 24 * 60 * 60 * 1000,
       // Токен действует 24 часа
+        emailVerified: true
     });
 
     const savedUser = await user.save();
 
     // Отправляем письмо с подтверждением
-    await sendVerificationEmail(email, savedUser.emailVerificationToken);
+    // await sendVerificationEmail(email, savedUser.emailVerificationToken);
 
     const token = jwt.sign(
       { userId: savedUser._id },

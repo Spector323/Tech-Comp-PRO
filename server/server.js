@@ -12,7 +12,7 @@ const orderRoutes = require('./routes/order.routes');
 
 const app = express();
 
-// ✅ ПРАВИЛЬНЫЙ CORS для Vite разработки
+//  ПРАВИЛЬНЫЙ CORS для Vite разработки
 app.use(cors({
   origin: 'http://localhost:5173', // Порт Vite
   credentials: true
@@ -23,17 +23,17 @@ connectDB();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ СОЗДАЕМ ПАПКУ uploads при запуске
+//  СОЗДАЕМ ПАПКУ uploads при запуске
 const uploadsDir = path.join(__dirname, 'uploads');
 const fs = require('fs');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
-  console.log('✅ Папка uploads создана');
+  console.log(' Папка uploads создана');
 }
 
 app.use('/uploads', express.static(uploadsDir));
 
-// ✅ ДОБАВЛЯЕМ ПРОПУЩЕННЫЙ ENDPOINT
+//  ДОБАВЛЯЕМ ПРОПУЩЕННЫЙ ENDPOINT
 app.get('/api/auth/me', require('./middleware/auth'), (req, res) => {
   res.json({
     success: true,
